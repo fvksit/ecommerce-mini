@@ -11,16 +11,22 @@ use Illuminate\Validation\ValidationException;
 
 class Authentication extends Controller
 {
-    public function Login(LoginRequest $request)
+    public function login(LoginRequest $request)
     {
+        $user = User::where('email', $request->email)->first();
         if (!auth()->attempt($request->only('email', 'password'))) {
             throw ValidationException::withMessages([
                 'email' => ['The provided credentials are incorrect.'],
             ]);
         }
+
+        return response()->json([
+            'message' => 'Login successful',
+            'token' => $user->createToken('ecommerce')->plainTextToken
+        ]);
     }
 
-    public function Register(RegisterRequest $request)
+    public function register(RegisterRequest $request)
     {
         User::create($request->getData());
     }
@@ -42,8 +48,14 @@ class Authentication extends Controller
         ], 200);
     }
 
-    public function Logout(Request $request)
+    public function logout(Request $request)
     {
         auth()->guard('web')->logout();
+
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json([
+            'message' => 'Logout successful'
+        ], 200);
     }
 }
