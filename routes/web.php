@@ -24,7 +24,7 @@ Route::get('/', function () {
 Route::prefix('admin')->group(function () {
     Route::post('/login', [Authentication::class, 'Login']);
 
-    route::middleware(['auth:sanctum'])->group(function () {
+    route::middleware(['auth:sanctum', 'admin'])->group(function () {
         Route::get('/me', [MeController::class, 'index']);
         Route::get('/me//', [MeController::class, 'show']);
         Route::post('/logout', [Authentication::class, 'Logout']);
