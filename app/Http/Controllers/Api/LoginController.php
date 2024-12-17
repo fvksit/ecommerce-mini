@@ -25,7 +25,7 @@ class LoginController extends Controller
 
         return response()->json([
             'message' => 'Login successful',
-            'access_token' => $user->createToken($user->email)->plainTextToken
+            'token' => $user->createToken('ecommerce')->plainTextToken
         ]);
     }
 }
