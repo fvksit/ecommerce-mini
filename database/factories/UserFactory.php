@@ -46,7 +46,7 @@ class UserFactory extends Factory
 
     public function user(): static
     {
-        return $this->state9([
+        return $this->state([
             'role' => 'user'
         ]);
     }
