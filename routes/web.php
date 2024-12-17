@@ -22,13 +22,14 @@ Route::get('/', function () {
 });
 
 Route::prefix('admin')->group(function () {
-    Route::get('/me', [MeController::class, 'index']);
     Route::post('/login', [Authentication::class, 'Login']);
-    Route::post('/register', [Authentication::class, 'Register']);
-    Route::post('/logout', [Authentication::class, 'Logout']);
-    Route::put('/update/{userid}', [Authentication::class, 'Update']);
 
     route::middleware(['auth:sanctum'])->group(function () {
+        Route::get('/me', [MeController::class, 'index']);
+        Route::get('/me//', [MeController::class, 'show']);
+        Route::post('/logout', [Authentication::class, 'Logout']);
+        Route::put('/update/{userid}', [Authentication::class, 'Update']);
+        Route::post('/register', [Authentication::class, 'Register']);
         Route::resource('/category', CategoryController::class);
     });
 });
