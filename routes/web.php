@@ -22,7 +22,7 @@ Route::get('/', function () {
 });
 
 Route::prefix('admin')->group(function () {
-    Route::post('/login', [Authentication::class, 'Login']);
+    Route::post('/login', [Authentication::class, 'Login'])->middleware('guest');
 
     route::middleware(['auth:sanctum', 'admin'])->group(function () {
         Route::get('/me', [MeController::class, 'index']);
