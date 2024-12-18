@@ -13,22 +13,12 @@ class Authentication extends Controller
 {
     public function login(LoginRequest $request)
     {
-        $user = User::where('email', $request->email)->first();
-        if (!auth()->attempt($request->only('email', 'password'))) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.'],
-            ]);
-        }
-
-        return response()->json([
-            'message' => 'Login successful',
-            'token' => $user->createToken('ecommerce')->plainTextToken
-        ]);
+        return view('admin.login');
     }
 
     public function register(RegisterRequest $request)
     {
-        User::create($request->getData());
+        return view('admin.register');
     }
 
     public function update(UpdatedRequest $request, $userid)
@@ -51,8 +41,6 @@ class Authentication extends Controller
     public function logout(Request $request)
     {
         auth()->guard('web')->logout();
-
-        $request->user()->currentAccessToken()->delete();
 
         return response()->json([
             'message' => 'Logout successful'

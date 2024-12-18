@@ -1,9 +1,13 @@
 <?php
 
+use App\Http\Controllers\AdminController;
 use App\Http\Controllers\Api\MeController;
 use App\Http\Controllers\Authentication;
 use App\Http\Controllers\CategoryController;
-use App\Models\Category;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\LogoutController;
+use App\Http\Controllers\RegisterController;
+use App\Http\Controllers\UpdatedController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -21,15 +25,21 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::prefix('admin')->group(function () {
-    Route::post('/login', [Authentication::class, 'login']);
+Route::name('admin.')->prefix('admin')->group(function () {
+    Route::get('/login', [Authentication::class, 'login'])->name('login');
+    Route::post('/login', LoginController::class)->name('login');
 
-    route::middleware(['auth:sanctum', 'admin'])->group(function () {
+    Route::middleware(['auth:sanctum', 'admin'])->group(function () {
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
         Route::get('/me', [MeController::class, 'index']);
         Route::get('/me//', [MeController::class, 'show']);
-        Route::post('/logout', [Authentication::class, 'logout']);
-        Route::put('/update/{userid}', [Authentication::class, 'update']);
-        Route::post('/register', [Authentication::class, 'register']);
+
+        Route::post('/logout', LogoutController::class)->name('logout');
+        Route::put('/update/{userid}', UpdatedController::class)->name('update');
+
+        Route::view('/register', 'admin.register')->name('register');
+        Route::post('/register', RegisterController::class)->name('register');
+
         Route::resource('/category', CategoryController::class);
     });
 });
