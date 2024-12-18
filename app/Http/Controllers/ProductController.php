@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
@@ -14,7 +15,7 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return ProductResource::collection(Product::all());
+        return ProductResource::collection(Product::with(['category', 'images'])->get());
     }
 
     /**
@@ -32,6 +33,15 @@ class ProductController extends Controller
     {
         $product = Product::create($request->validated());
 
+        if ($request->has('images')) {
+            foreach ($request->file('images') as $image) {
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $image->store('products', 'public'),
+                ]);
+            }
+        }
+
         return ProductResource::make($product);
     }
 
@@ -40,7 +50,10 @@ class ProductController extends Controller
      */
     public function show(Product $product)
     {
-        return ProductResource::make($product);
+        return new ProductResource($product->load(
+            'category',
+            'images'
+        ));
     }
 
     /**
@@ -57,6 +70,15 @@ class ProductController extends Controller
     public function update(UpdateProductRequest $request, Product $product)
     {
         $product->update($request->validated());
+
+        if ($request->has('images')) {
+            foreach ($request->file('images') as $image) {
+                ProductImage::create([
+                    'product_id' => $product->id,
+                    'image_path' => $image->store('products', 'public'),
+                ]);
+            }
+        }
 
         return ProductResource::make($product);
     }

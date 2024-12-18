@@ -40,7 +40,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        return CategoryResource::make($category);
+        return new CategoryResource($category);
     }
 
     /**
@@ -58,7 +58,7 @@ class CategoryController extends Controller
     {
         $category->update($request->validated());
 
-        return CategoryResource::make($category);
+        return new CategoryResource($category);
     }
 
     /**

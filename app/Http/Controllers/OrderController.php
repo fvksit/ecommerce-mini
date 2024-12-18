@@ -5,23 +5,28 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Http\Requests\StoreOrderRequest;
 use App\Http\Requests\UpdateOrderRequest;
+use App\Http\Resources\OrderResource;
+use App\Models\User;
+use Illuminate\Http\Request;
 
 class OrderController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        //
+        $orders = Order::with('user')->get();
+        return OrderResource::collection($orders);
     }
 
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
+    public function create(User $user)
     {
-        //
+        $orders = $user->orders()->where('status', 'completed')->get();
+        return OrderResource::collection($orders);
     }
 
     /**
@@ -37,7 +42,7 @@ class OrderController extends Controller
      */
     public function show(Order $order)
     {
-        //
+        return new OrderResource($order->load('products'));
     }
 
     /**

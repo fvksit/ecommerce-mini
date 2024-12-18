@@ -6,6 +6,8 @@ use App\Http\Controllers\Authentication;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UpdatedController;
 use Illuminate\Support\Facades\Route;
@@ -27,19 +29,21 @@ Route::get('/', function () {
 
 Route::name('admin.')->prefix('admin')->group(function () {
     Route::get('/login', [Authentication::class, 'login'])->name('login');
-    Route::post('/login', LoginController::class)->name('login');
+    Route::post('/login', LoginController::class)->name('login.store');
 
     Route::middleware(['auth:sanctum', 'admin'])->group(function () {
-        Route::get('/dashboard', [AdminController::class, 'index'])->name('dashboard');
-        Route::get('/me', [MeController::class, 'index']);
-        Route::get('/me//', [MeController::class, 'show']);
-
         Route::post('/logout', LogoutController::class)->name('logout');
-        Route::put('/update/{userid}', UpdatedController::class)->name('update');
+        Route::put('/update/{userid}', UpdatedController::class);
 
         Route::view('/register', 'admin.register')->name('register');
-        Route::post('/register', RegisterController::class)->name('register');
+        Route::post('/register', RegisterController::class)->name('register.store');
+
+        Route::get('/dashboard', [AdminController::class, 'index'])->name('index');
 
         Route::resource('/category', CategoryController::class);
+
+        Route::resource('/product', ProductController::class);
+
+        Route::resource('/order', OrderController::class)->only(['index', 'create', 'show']);
     });
 });
