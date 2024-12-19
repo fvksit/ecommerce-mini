@@ -1,7 +1,7 @@
 // import { createApp } from 'vue';
 // import App from './App.vue';
 // import { createRouter, createWebHistory } from 'vue-router';
-import '../css/app.css';
+// import '../css/app.css';
 // import axios from 'axios';
 
 // import Login from './components/auth/Login.vue';
@@ -25,3 +25,11 @@ import '../css/app.css';
 // app.config.globalProperties.$axios = axios;
 // app.use(router);
 // app.mount('#app');
+
+import { createApp } from 'vue';
+import router from './router';
+import App from './App.vue';
+
+const app = createApp(App);
+app.use(router);
+app.mount('#app');

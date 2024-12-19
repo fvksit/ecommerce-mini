@@ -14,7 +14,6 @@ class LoginController extends Controller
      */
     public function __invoke(LoginRequest $request)
     {
-
         $user = User::where('email', $request->email)->first();
 
         if (!$user || !Hash::check($request->password, $user->password)) {
@@ -27,6 +26,5 @@ class LoginController extends Controller
             'message' => 'Login successful',
             'token' => $user->createToken('ecommerce')->plainTextToken
         ]);
-
     }
 }

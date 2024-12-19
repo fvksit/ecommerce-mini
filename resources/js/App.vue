@@ -1,153 +1,143 @@
 <template>
-    <div class="flex flex-col min-h-screen bg-gray-100">
-        <!-- Navbar -->
-        <nav class="bg-blue-600 text-white p-4 shadow-lg">
-            <div class="container mx-auto flex justify-between items-center">
-                <!-- Logo with image -->
-                <img alt="Logo" class="w-10 h-10 mr-2" />
-                <span
-                    class="text-3xl font-bold hover:text-blue-200 transition duration-200"
-                    >Your Company</span
+    <div id="app">
+        <!-- Header atau navigasi global -->
+        <header class="app-header">
+            <nav class="navbar">
+                <router-link v-if="isLoggedIn" to="/admin/dashboard"
+                    >Dashboard</router-link
                 >
-
-                <!-- Desktop Menu -->
-                <ul class="hidden md:flex space-x-6">
-                    <!-- Jika Belum Login -->
-                    <li v-if="!isLoggedIn">
-                        <router-link
-                            to="/admin/login"
-                            class="hover:text-yellow-300 transition duration-200"
-                            >Login</router-link
-                        >
-                    </li>
-
-                    <!-- Jika Sudah Login -->
-                    <li v-else>
-                        <button
-                            @click="handleLogout"
-                            class="hover:text-red-300 transition duration-200"
-                        >
-                            Logout
-                        </button>
-                    </li>
-                </ul>
-
-                <!-- Mobile Menu Icon -->
-                <div class="md:hidden">
-                    <button
-                        @click="toggleMobileMenu"
-                        class="text-white focus:outline-none"
-                    >
-                        ☰
-                    </button>
-                </div>
-            </div>
-
-            <!-- Mobile Menu -->
-            <div
-                v-if="isMobileMenuOpen"
-                class="md:hidden fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 z-10"
-            >
-                <div class="flex justify-end p-4">
-                    <button
-                        @click="toggleMobileMenu"
-                        class="text-white text-3xl"
-                    >
-                        &times;
-                    </button>
-                </div>
-                <div
-                    class="flex flex-col items-center text-white space-y-6 mt-12"
+                <router-link v-if="isLoggedIn" to="/admin/categories"
+                    >Categories</router-link
                 >
-                    <!-- Jika Belum Login -->
-                    <router-link
-                        v-if="!isLoggedIn"
-                        to="/admin/login"
-                        class="text-lg"
-                    >
-                        Login
-                    </router-link>
+                <router-link v-if="isLoggedIn" to="/admin/products"
+                    >Products</router-link
+                >
+                <router-link v-if="isLoggedIn" to="/admin/orders"
+                    >Orders</router-link
+                >
+                <button v-if="isLoggedIn" @click="logout" class="btn-logout">
+                    Logout
+                </button>
+            </nav>
+        </header>
 
-                    <!-- Jika Sudah Login -->
-                    <button
-                        v-else
-                        @click="handleLogout"
-                        class="text-lg hover:text-red-300"
-                    >
-                        Logout
-                    </button>
-                </div>
-            </div>
-        </nav>
-
-        <!-- Main Content -->
-        <main class="flex-1 container mx-auto p-4">
+        <!-- Router View untuk menampilkan komponen sesuai dengan rute -->
+        <main class="app-main">
             <router-view></router-view>
         </main>
 
-        <!-- Footer -->
-        <footer class="bg-blue-600 text-white p-4 mt-10">
-            <div class="container mx-auto text-center">
-                <p>&copy; 2024 Your Company. All Rights Reserved.</p>
-                <div class="flex justify-center space-x-4 mt-4">
-                    <a href="#" class="text-white hover:text-blue-300">
-                        <img alt="Facebook" class="w-6 h-6" />
-                    </a>
-                    <a href="#" class="text-white hover:text-blue-300">
-                        <img alt="Twitter" class="w-6 h-6" />
-                    </a>
-                    <a href="#" class="text-white hover:text-blue-300">
-                        <img alt="LinkedIn" class="w-6 h-6" />
-                    </a>
-                </div>
-            </div>
+        <!-- Footer global -->
+        <footer class="app-footer">
+            <p>&copy; 2024 Admin Panel</p>
         </footer>
     </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
-    data() {
-        return {
-            isMobileMenuOpen: false, // Untuk menu mobile
-            isLoggedIn: false, // Status login pengguna
-        };
-    },
-    created() {
-        this.checkLoginStatus(); // Cek status login saat komponen dibuat
+    computed: {
+        isLoggedIn() {
+            return !!localStorage.getItem("token");
+        },
     },
     methods: {
-        toggleMobileMenu() {
-            this.isMobileMenuOpen = !this.isMobileMenuOpen; // Toggle menu mobile
-        },
-        checkLoginStatus() {
-            // Cek apakah pengguna memiliki token (login status)
-            this.isLoggedIn = !!localStorage.getItem("token"); // Jika ada token, isLoggedIn = true
-        },
-        handleLogout() {
-            // Hapus token login
-            localStorage.removeItem("token");
-            this.isLoggedIn = false; // Set status login ke false
-            this.$router.push("/admin/login"); // Redirect ke halaman login
+        async logout() {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                console.error("No token found. Redirecting to login.");
+                this.$router.push({ name: "admin.login" });
+                return;
+            }
+
+            console.log("Token from localStorage:", token);
+            try {
+                await axios.post(
+                    "/admin/logout",
+                    {},
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                );
+                // Remove token from localStorage after successful logout
+                localStorage.removeItem("token");
+                this.$router.push({ name: "admin.login" });
+            } catch (error) {
+                console.error(
+                    "Logout failed:",
+                    error.response?.data || error.message
+                );
+            }
         },
     },
 };
 </script>
 
 <style scoped>
-/* Additional custom styles for responsive design */
-@media (max-width: 768px) {
-    /* Mobile Menu */
-    .mobile-menu {
-        background-color: rgba(0, 0, 0, 0.5);
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-    }
+/* General Styling */
+body {
+    font-family: "Arial", sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Header Styling */
+.app-header {
+    background-color: #007bff;
+    padding: 10px 20px;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.navbar {
+    display: flex;
+    gap: 10px;
+}
+
+.navbar a {
+    color: white;
+    text-decoration: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.navbar a:hover {
+    background-color: #0056b3;
+}
+
+.btn-logout {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-logout:hover {
+    background-color: #c82333;
+}
+
+/* Main Content Styling */
+.app-main {
+    padding: 20px;
+}
+
+/* Footer Styling */
+.app-footer {
+    background-color: #f1f1f1;
+    text-align: center;
+    padding: 10px;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
 }
 </style>

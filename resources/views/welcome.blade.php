@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{{-- <!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -40,6 +40,26 @@
                 </form>
             @endauth
         </div>
+    </div>
+</body>
+
+</html> --}}
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel</title>
+    @vite('resources/js/app.js') <!-- Hubungkan Vite -->
+</head>
+
+<body>
+    <div id="app">
+        <!-- Semua konten Vue.js akan dirender di sini -->
+        <router-view></router-view>
     </div>
 </body>
 

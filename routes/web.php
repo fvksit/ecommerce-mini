@@ -23,19 +23,25 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
+// Route::get('/', function () {
+//     return view('welcome');
+// });
+
+
+Route::get('/{any}', function () {
     return view('welcome');
-});
+})->where('any', '.*');
+
 
 Route::name('admin.')->prefix('admin')->group(function () {
-    Route::get('/login', [Authentication::class, 'login'])->name('login');
+    // Route::get('/login', [Authentication::class, 'login'])->name('login');
     Route::post('/login', LoginController::class)->name('login.store');
 
     Route::middleware(['auth:sanctum', 'admin'])->group(function () {
         Route::post('/logout', LogoutController::class)->name('logout');
         Route::put('/update/{userid}', UpdatedController::class);
 
-        Route::view('/register', 'admin.register')->name('register');
+        // Route::view('/register', 'admin.register')->name('register');
         Route::post('/register', RegisterController::class)->name('register.store');
 
         Route::get('/dashboard', [AdminController::class, 'index'])->name('index');
