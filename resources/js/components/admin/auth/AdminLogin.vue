@@ -65,6 +65,17 @@ export default {
                     email: this.email,
                     password: this.password,
                 });
+
+                // Assuming the response contains user role data
+                if (response.data.role !== "admin") {
+                    this.errors = {
+                        general: "Unauthorized access. Admins only.",
+                    };
+                    localStorage.removeItem("token");
+                    window.location.href = "/admin/login";
+                    return;
+                }
+
                 // Assuming the token is in the response data
                 localStorage.setItem("token", response.data.token);
                 console.log("Login successful. Token saved.");

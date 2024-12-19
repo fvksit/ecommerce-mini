@@ -1,35 +1,9 @@
 <template>
     <div id="app">
-        <!-- Header atau navigasi global -->
-        <header class="app-header">
-            <nav class="navbar">
-                <router-link v-if="isLoggedIn" to="/admin/dashboard"
-                    >Dashboard</router-link
-                >
-                <router-link v-if="isLoggedIn" to="/admin/categories"
-                    >Categories</router-link
-                >
-                <router-link v-if="isLoggedIn" to="/admin/products"
-                    >Products</router-link
-                >
-                <router-link v-if="isLoggedIn" to="/admin/orders"
-                    >Orders</router-link
-                >
-                <button v-if="isLoggedIn" @click="logout" class="btn-logout">
-                    Logout
-                </button>
-            </nav>
-        </header>
-
-        <!-- Router View untuk menampilkan komponen sesuai dengan rute -->
+        <!-- Router View to display the component based on the route -->
         <main class="app-main">
             <router-view></router-view>
         </main>
-
-        <!-- Footer global -->
-        <footer class="app-footer">
-            <p>&copy; 2024 Admin Panel</p>
-        </footer>
     </div>
 </template>
 
@@ -97,6 +71,12 @@ body {
 
 .navbar {
     display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.nav-links {
+    display: flex;
     gap: 10px;
 }
 
@@ -126,18 +106,43 @@ body {
     background-color: #c82333;
 }
 
-/* Main Content Styling */
-.app-main {
+/* Sidebar Styling */
+.sidebar {
+    display: none;
+    flex-direction: column;
+    background-color: #333;
     padding: 20px;
+    position: fixed;
+    top: 60px; /* Adjust based on header height */
+    left: 0;
+    height: 100%;
+    width: 200px;
+    z-index: 1000;
 }
 
-/* Footer Styling */
-.app-footer {
-    background-color: #f1f1f1;
-    text-align: center;
+.sidebar a {
+    color: white;
+    text-decoration: none;
     padding: 10px;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+.sidebar a:hover {
+    background-color: #575757;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        display: flex;
+    }
+
+    .app-main {
+        margin-left: 200px; /* Adjust based on sidebar width */
+    }
+
+    .navbar .nav-links {
+        display: none;
+    }
 }
 </style>

@@ -2,10 +2,8 @@
     <div v-if="isLoggedIn" class="dashboard-container">
         <header class="app-header">
             <nav class="navbar">
-                <h1>Admin Dashboard</h1>
-                <router-link @click.native="logout" class="logout-link"
-                    >Logout</router-link
-                >
+                <h1 class="navbar-title">Admin Dashboard</h1>
+                <button @click="logout" class="btn-logout">Logout</button>
             </nav>
         </header>
         <div class="content">
@@ -67,7 +65,6 @@ export default {
                         },
                     }
                 );
-                // Remove token from localStorage after successful logout
                 localStorage.removeItem("token");
                 this.$router.push({ name: "admin.login" });
             } catch (error) {
@@ -98,21 +95,29 @@ export default {
     align-items: center;
 }
 
-.navbar h1 {
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.navbar-title {
     margin: 0;
 }
 
-.logout-link {
+.btn-logout {
+    background-color: #dc3545;
     color: white;
-    text-decoration: none;
-    cursor: pointer;
-    padding: 10px 15px;
+    border: none;
     border-radius: 5px;
+    padding: 10px 15px;
+    cursor: pointer;
     transition: background-color 0.3s;
+    margin-left: auto;
 }
 
-.logout-link:hover {
-    background-color: #0056b3;
+.btn-logout:hover {
+    background-color: #c82333;
 }
 
 .content {
@@ -129,20 +134,9 @@ export default {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.main-content {
-    flex-grow: 1;
-    padding: 20px;
-    margin-left: 20px;
-    border: 1px solid #ccc;
-    border-radius: 10px;
-    background-color: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-
 .dashboard-menu {
     list-style: none;
     padding: 0;
-    margin: 0;
 }
 
 .dashboard-menu li {
@@ -150,16 +144,45 @@ export default {
 }
 
 .dashboard-menu a {
-    display: block;
-    padding: 10px 15px;
-    background-color: #007bff;
-    color: white;
     text-decoration: none;
+    color: #007bff;
+    padding: 10px 15px;
+    display: block;
     border-radius: 5px;
     transition: background-color 0.3s;
 }
 
 .dashboard-menu a:hover {
-    background-color: #0056b3;
+    background-color: #e9ecef;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: 20px;
+}
+
+@media (max-width: 768px) {
+    .sidebar {
+        display: none;
+    }
+
+    .app-main {
+        margin-left: 0;
+    }
+
+    .navbar .nav-links {
+        display: flex;
+        flex-direction: column;
+        background-color: #007bff;
+        position: absolute;
+        top: 60px;
+        left: 0;
+        width: 100%;
+        padding: 10px;
+    }
+
+    .navbar .nav-links a {
+        margin: 5px 0;
+    }
 }
 </style>
