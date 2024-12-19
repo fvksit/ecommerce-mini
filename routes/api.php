@@ -36,10 +36,11 @@ Route::prefix('auth')->group(function () {
 
         Route::get('/product', [ProductController::class, 'index']);
 
+        Route::get('/order', [OrderController::class, 'index']);
         Route::post('/order', [OrderController::class, 'create']);
 
         Route::post('/cart', [CartController::class, 'store']);
-        Route::post('/cart/{productId}', [CartController::class, 'destroy']);
-        Route::post('/cart/{productId}', [CartController::class, 'update']);
+        Route::put('/cart/{productId}', [CartController::class, 'destroy']);
+        Route::delete('/cart/{productId}', [CartController::class, 'update']);
     });
 });

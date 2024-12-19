@@ -6,12 +6,21 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\CartRequest;
 use App\Http\Resources\CartResource;
 use App\Models\Order;
+use App\Models\Product;
 use Illuminate\Http\Request;
 
 class CartController extends Controller
 {
     public function store(CartRequest $request)
     {
+        $product = Product::findOrFail($request->product_id);
+
+        if ($product->stock < $request->quantity) {
+            return response()->json([
+                'error' => "Insufficient stock available"
+            ], 400);
+        }
+
         $order = Order::firstOrCreate(
             ['user_id' => auth()->id(), 'status' => 'pending'],
             ['total_price' => 0]
@@ -35,7 +44,15 @@ class CartController extends Controller
 
     public function destroy(Request $request, $productId)
     {
-        $order = Order::where('user_id', auth()->id())->where('status', 'pending')->firstOrFail();
+        $order = Order::where('user_id', auth()->id())
+                        ->where('status', 'pending')
+                        ->firstOrFail();
+
+        $product = $order->products()->find($productId);
+
+        if (!$product) {
+            return response()->json(['message' => 'Product not found in cart.'], 404);
+        }
 
         $order->products()->detach($productId);
 
@@ -56,12 +73,23 @@ class CartController extends Controller
     public function update(Request $request, $productId)
     {
         $order = Order::where('user_id', auth()->id())
-            ->where('status', 'pending')
-            ->firstOrFail();
+                    ->where('status', 'pending')
+                    ->firstOrFail();
+
+        $product = Product::findOrFail($productId);
+
+        if ($product->stock < $request->quantity) {
+            return response()->json(['error' => 'Insufficient stock available.'], 400);
+        }
+
+        $existingProduct = $order->products()->find($productId);
+        if (!$existingProduct) {
+            return response()->json(['error' => 'Product not found in cart.'], 404);
+        }
 
         $order->products()->updateExistingPivot($productId, [
             'quantity' => $request->quantity,
-            'price' => $request->quantity * $order->products()->find($productId)->price,
+            'price' => $request->quantity * $product->price,
         ]);
 
         $totalPrice = $order->products->sum(function ($product) {
@@ -71,5 +99,6 @@ class CartController extends Controller
         $order->update(['total_price' => $totalPrice]);
 
         return new CartResource($order);
+
     }
 }
