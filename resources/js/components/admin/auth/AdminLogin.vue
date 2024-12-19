@@ -11,12 +11,18 @@
             </div>
             <div class="form-group">
                 <label for="password">Password:</label>
-                <input
-                    type="password"
-                    id="password"
-                    v-model="password"
-                    required
-                />
+                <div class="password-input">
+                    <input
+                        :type="passwordFieldType"
+                        id="password"
+                        v-model="password"
+                        required
+                    />
+                    <i
+                        :class="passwordIcon"
+                        @click="togglePasswordVisibility"
+                    ></i>
+                </div>
                 <span v-if="errors.password" class="error-message">{{
                     errors.password[0]
                 }}</span>
@@ -37,10 +43,22 @@ export default {
         return {
             email: "",
             password: "",
+            showPassword: false,
             errors: {},
         };
     },
+    computed: {
+        passwordFieldType() {
+            return this.showPassword ? "text" : "password";
+        },
+        passwordIcon() {
+            return this.showPassword ? "fas fa-eye-slash" : "fas fa-eye";
+        },
+    },
     methods: {
+        togglePasswordVisibility() {
+            this.showPassword = !this.showPassword;
+        },
         async login() {
             try {
                 const response = await axios.post("/admin/login", {
@@ -96,8 +114,26 @@ label {
     font-weight: bold;
 }
 
+.password-input {
+    display: flex;
+    align-items: center;
+    position: relative;
+}
+
+.password-input input {
+    flex-grow: 1;
+}
+
+.password-input i {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+    color: #007bff;
+}
+
 input[type="email"],
-input[type="password"] {
+input[type="password"],
+input[type="text"] {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
