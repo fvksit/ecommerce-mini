@@ -1,8 +1,11 @@
 <?php
 
+use App\Http\Controllers\Api\CartController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\LogoutController;
 use App\Http\Controllers\Api\MeController;
+use App\Http\Controllers\Api\OrderController;
+use App\Http\Controllers\Api\ProductController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\UpdatedController;
 use Illuminate\Support\Facades\Route;
@@ -30,5 +33,13 @@ Route::prefix('auth')->group(function () {
         Route::get('/me', [MeController::class, 'show']);
         Route::post('/logout', LogoutController::class);
         Route::put('/update/{userid}', UpdatedController::class);
+
+        Route::get('/product', [ProductController::class, 'index']);
+
+        Route::post('/order', [OrderController::class, 'create']);
+
+        Route::post('/cart', [CartController::class, 'store']);
+        Route::post('/cart/{productId}', [CartController::class, 'destroy']);
+        Route::post('/cart/{productId}', [CartController::class, 'update']);
     });
 });
