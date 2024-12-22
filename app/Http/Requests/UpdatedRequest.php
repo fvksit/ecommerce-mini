@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdatedRequest extends FormRequest
@@ -21,9 +22,20 @@ class UpdatedRequest extends FormRequest
      */
     public function rules()
     {
-        return [
+        $rules = [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $this->route('userid'),
         ];
+
+        $user = User::find($this->route('user'));
+
+        if ($user) {
+            if ($this->filled('email') && $this->input('email') !== $user->email) {
+                $rules['email'] = 'required|email|unique:users,email';
+            }
+        } else {
+            abort(404, 'User not found');
+        }
+
+        return $rules;
     }
 }

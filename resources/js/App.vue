@@ -20,12 +20,9 @@ export default {
         async logout() {
             const token = localStorage.getItem("token");
             if (!token) {
-                console.error("No token found. Redirecting to login.");
                 this.$router.push({ name: "admin.login" });
                 return;
             }
-
-            console.log("Token from localStorage:", token);
             try {
                 await axios.post(
                     "/admin/logout",

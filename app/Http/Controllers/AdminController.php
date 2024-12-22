@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\User;
 use App\Http\Resources\UserResource;
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -13,8 +14,13 @@ class AdminController extends Controller
      */
     public function index()
     {
-        // return view('admin.dashboard');
-        return UserResource::collection(User::all());
+        $loggedInUser = Auth::user();
+        $users = User::all();
+
+        return response()->json([
+            'loggedInUser' => new UserResource($loggedInUser),
+            'users' => UserResource::collection($users),
+        ]);
     }
 
     /**
@@ -38,6 +44,8 @@ class AdminController extends Controller
      */
     public function show(User $user)
     {
+        $user->load('orders');
+
         return new UserResource($user);
     }
 

@@ -4,7 +4,7 @@ import Dashboard from './components/admin/Dashboard.vue';
 import CategoryList from './components/admin/category/CategoryList.vue';
 import ProductList from './components/admin/product/ProductList.vue';
 import OrderList from './components/admin/order/OrderList.vue';
-import NotFound from './components/NotFound.vue'; // Buat komponen NotFound.vue
+import NotFound from './components/NotFound.vue';
 
 const routes = [
     { path: '/admin/login', component: AdminLogin, name: 'admin.login' },
