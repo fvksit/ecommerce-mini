@@ -70,11 +70,13 @@ export default {
                     }
                 );
                 this.$emit("categoryCreated", response.data.data);
+
                 const createModal = Modal.getInstance(
                     document.getElementById("createCategoryModal")
                 );
                 createModal.hide();
                 this.newCategory.name = "";
+                window.location.reload();
             } catch (error) {
                 console.error("Error creating category:", error);
             }

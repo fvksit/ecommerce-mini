@@ -51,10 +51,8 @@
                             </tbody>
                         </table>
                     </div>
-                    <!-- Create Category Modal -->
                     <CreateCategoryModal @categoryCreated="fetchCategories" />
 
-                    <!-- Edit Category Modal -->
                     <EditCategoryModal
                         :category="currentCategory"
                         @categoryUpdated="updateCategoryList"
@@ -139,11 +137,13 @@ export default {
             );
             editModal.show();
         },
-        updateCategoryList(updatedCategory) {
+        async updateCategoryList(updatedCategory) {
             const index = this.categories.findIndex(
                 (category) => category.id === updatedCategory.id
             );
-            this.categories.splice(index, 1, updatedCategory);
+            if (index !== -1) {
+                this.categories.splice(index, 1, updatedCategory);
+            }
             this.destroyDataTable();
             this.initDataTable();
         },
