@@ -8,6 +8,7 @@ use App\Http\Controllers\LoginController;
 use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
+use App\Http\Controllers\ProductImageController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UpdatedController;
 use Illuminate\Support\Facades\Route;
@@ -43,6 +44,7 @@ Route::name('admin.')->prefix('admin')->group(function () {
         Route::resource('/category', CategoryController::class);
 
         Route::resource('/product', ProductController::class);
+        Route::post('/product/{product}/images', [ProductImageController::class, 'store']);
 
         Route::resource('/order', OrderController::class)->only(['index', 'create', 'show']);
     });

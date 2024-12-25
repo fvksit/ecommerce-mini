@@ -15,7 +15,7 @@ class CartController extends Controller
     {
         $product = Product::findOrFail($request->product_id);
 
-        if ($product->stock < $request->quantity) {
+        if ($product->stock > $request->quantity) {
             return response()->json([
                 'error' => "Insufficient stock available"
             ], 400);

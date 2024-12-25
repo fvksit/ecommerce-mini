@@ -7,6 +7,7 @@ use App\Models\ProductImage;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Http\Resources\ProductResource;
+use Illuminate\Support\Facades\Log;
 
 class ProductController extends Controller
 {
@@ -15,7 +16,8 @@ class ProductController extends Controller
      */
     public function index()
     {
-        return ProductResource::collection(Product::with(['category', 'images'])->get());
+        $products = Product::with('category', 'images')->get();
+        return ProductResource::collection($products);
     }
 
     /**
@@ -35,9 +37,10 @@ class ProductController extends Controller
 
         if ($request->has('images')) {
             foreach ($request->file('images') as $image) {
+                $path = $image->store('products', 'public');
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'image_path' => $image->store('products', 'public'),
+                    'image_path' => $path,
                 ]);
             }
         }
@@ -71,16 +74,23 @@ class ProductController extends Controller
     {
         $product->update($request->validated());
 
+        if ($request->has('deleted_image_ids')) {
+            ProductImage::whereIn('id', $request->deleted_image_ids)
+            ->where('product_id', $product->id)
+            ->delete();
+        }
+
         if ($request->has('images')) {
             foreach ($request->file('images') as $image) {
+                $path = $image->store('products', 'public');
                 ProductImage::create([
                     'product_id' => $product->id,
-                    'image_path' => $image->store('products', 'public'),
+                    'image_path' => $path,
                 ]);
             }
         }
 
-        return ProductResource::make($product);
+        return new ProductResource($product->load('category', 'images'));
     }
 
     /**
@@ -88,8 +98,16 @@ class ProductController extends Controller
      */
     public function destroy(Product $product)
     {
-        $product->delete();
+        try {
+            $product->images()->delete();
+            $product->delete();
 
-        return response()->noContent();
+            return response()->noContent();
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'Failed to delete product',
+                'message' => $e->getMessage()
+            ], 500);
+        }
     }
 }
