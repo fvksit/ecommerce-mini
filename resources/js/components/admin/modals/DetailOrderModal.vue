@@ -38,7 +38,8 @@
                     </div>
 
                     <p>
-                        <strong>Total Price:</strong> ${{ order.total_price }}
+                        <strong>Total Price:</strong>
+                        {{ formatPrice(order.total_price) }}
                     </p>
 
                     <p>
