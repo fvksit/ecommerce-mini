@@ -23,7 +23,7 @@
                         <ul>
                             <li v-for="order in user.orders" :key="order.id">
                                 Order ID: {{ order.id }}, Total Price:
-                                {{ order.total_price }}, Status:
+                                {{ formatPrice(order.total_price) }}, Status:
                                 {{ order.status }}
                             </li>
                         </ul>
@@ -50,6 +50,15 @@
 export default {
     props: {
         user: Object,
+    },
+    methods: {
+        formatPrice(price) {
+            if (!price) return "Rp. 0";
+            const val = (price / 1).toFixed(0).replace(".", ",");
+            return (
+                `Rp. ` + val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+            );
+        },
     },
 };
 </script>

@@ -21,7 +21,9 @@
                     <p>
                         <strong>Description:</strong> {{ product.description }}
                     </p>
-                    <p><strong>Price:</strong> {{ product.price }}</p>
+                    <p>
+                        <strong>Price:</strong> {{ formatPrice(product.price) }}
+                    </p>
                     <p><strong>Stock:</strong> {{ product.stock }}</p>
                     <p>
                         <strong>Category:</strong>
@@ -53,7 +55,6 @@
                             />
                         </div>
                     </div>
-                    <!-- Additional product details here -->
                 </div>
                 <div class="modal-footer">
                     <button
@@ -78,6 +79,13 @@ export default {
         getImageUrl(imagePath) {
             const url = `${import.meta.env.VITE_API_URL}/storage/${imagePath}`;
             return url;
+        },
+        formatPrice(price) {
+            if (!price) return "Rp. 0";
+            const val = (price / 1).toFixed(0).replace(".", ",");
+            return (
+                `Rp. ` + val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+            );
         },
     },
 };

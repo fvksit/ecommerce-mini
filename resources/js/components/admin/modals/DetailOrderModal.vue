@@ -28,9 +28,8 @@
                                 :key="index"
                             >
                                 <strong>{{ product.name }}</strong> (Quantity
-                                Ordered: {{ product.quantity }}) - (Price: ${{
-                                    product.price
-                                }})
+                                Ordered: {{ product.quantity }}) -
+                                {{ formatPrice(product.price) }}
                             </li>
                         </ul>
                     </div>
@@ -78,6 +77,13 @@ export default {
                 second: "numeric",
             };
             return new Date(date).toLocaleDateString("en-US", options);
+        },
+        formatPrice(price) {
+            if (!price) return "Rp. 0";
+            const val = (price / 1).toFixed(0).replace(".", ",");
+            return (
+                `Rp. ` + val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+            );
         },
     },
     computed: {

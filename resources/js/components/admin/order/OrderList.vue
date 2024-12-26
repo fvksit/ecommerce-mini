@@ -39,7 +39,9 @@
                                 >
                                     <td>{{ index + 1 }}</td>
                                     <td>{{ order.user.name }}</td>
-                                    <td>{{ order.total_price }}</td>
+                                    <td>
+                                        {{ formatPrice(order.total_price) }}
+                                    </td>
                                     <td>{{ order.status }}</td>
                                     <td class="action-icons">
                                         <button
@@ -120,7 +122,13 @@ export default {
                 console.error("Error loading order details:", error);
             }
         },
-
+        formatPrice(price) {
+            if (!price) return "Rp. 0";
+            const val = (price / 1).toFixed(0).replace(".", ",");
+            return (
+                `Rp. ` + val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+            );
+        },
         closeModal() {
             this.isOrderDetailModalVisible = false;
         },
