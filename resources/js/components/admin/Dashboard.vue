@@ -30,6 +30,11 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <tr v-if="users.length === 0">
+                                        <td colspan="4" class="text-center">
+                                            No users available.
+                                        </td>
+                                    </tr>
                                     <tr
                                         v-for="(user, index) in users"
                                         :key="user.id"

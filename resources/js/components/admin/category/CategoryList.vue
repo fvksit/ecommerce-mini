@@ -27,6 +27,11 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr v-if="categories.length === 0">
+                                    <td colspan="3" class="text-center">
+                                        No categories available.
+                                    </td>
+                                </tr>
                                 <tr
                                     v-for="(category, index) in categories"
                                     :key="category.id"

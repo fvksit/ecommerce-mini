@@ -28,6 +28,11 @@
                                 </tr>
                             </thead>
                             <tbody>
+                                <tr v-if="products.length === 0">
+                                    <td colspan="5" class="text-center">
+                                        No products available.
+                                    </td>
+                                </tr>
                                 <tr
                                     v-for="(product, index) in products"
                                     :key="product.id"
