@@ -16,9 +16,12 @@
                     ></button>
                 </div>
                 <div class="modal-body">
-                    <p :style="statusStyle">
-                        <strong>Status:</strong> {{ order.status }}
-                    </p>
+                    <div
+                        :class="['status-shape', `status-${order.status}`]"
+                        :style="{ minWidth: `${order.status.length * 10}px` }"
+                    >
+                        {{ formatStatus(order.status) }}
+                    </div>
 
                     <div v-if="order.products && order.products.length">
                         <p><strong>Products:</strong></p>
@@ -79,6 +82,11 @@ export default {
             };
             return new Date(date).toLocaleDateString("en-US", options);
         },
+        formatStatus(status) {
+            return status.replace(/\b(\w)/g, (char) =>
+                char.toUpperCase().replace(/_/g, " ")
+            );
+        },
         formatPrice(price) {
             if (!price) return "Rp. 0";
             const val = (price / 1).toFixed(0).replace(".", ",");
@@ -87,28 +95,27 @@ export default {
             );
         },
     },
-    computed: {
-        statusStyle() {
-            let color = "";
-            let padding = "5px 10px";
-            if (this.order.status === "canceled") {
-                color = "red";
-            } else if (this.order.status === "pending") {
-                color = "grey";
-            } else if (this.order.status === "completed") {
-                color = "green";
-            }
-            return {
-                color: color,
-                padding: padding,
-                borderRadius: "5px",
-                fontWeight: "bold",
-            };
-        },
-    },
 };
 </script>
 
 <style scoped>
-/* Modal Styling */
+.status-shape {
+    display: inline-block;
+    padding: 5px 10px;
+    font-weight: bold;
+    border-radius: 8px;
+    color: white;
+}
+
+.status-canceled {
+    background-color: red;
+}
+
+.status-pending {
+    background-color: grey;
+}
+
+.status-completed {
+    background-color: green;
+}
 </style>

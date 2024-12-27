@@ -42,7 +42,21 @@
                                     <td>
                                         {{ formatPrice(order.total_price) }}
                                     </td>
-                                    <td>{{ order.status }}</td>
+                                    <td>
+                                        <div
+                                            :class="[
+                                                'status-shape',
+                                                `status-${order.status}`,
+                                            ]"
+                                            :style="{
+                                                minWidth: `${
+                                                    order.status.length * 10
+                                                }px`,
+                                            }"
+                                        >
+                                            {{ formatStatus(order.status) }}
+                                        </div>
+                                    </td>
                                     <td class="action-icons">
                                         <button
                                             @click="selectOrder(order)"
@@ -69,6 +83,10 @@
 
 <script>
 import axios from "axios";
+import $ from "jquery";
+import "datatables.net";
+import "datatables.net-bs5";
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 import OrderDetailModal from "../modals/DetailOrderModal.vue";
 import Navbar from "../navbar/Navbar.vue";
 import Sidebar from "../sidebar/Sidebar.vue";
@@ -101,11 +119,13 @@ export default {
                     },
                 });
                 this.orders = response.data.data;
+                this.$nextTick(() => {
+                    $("#orders-table").DataTable();
+                });
             } catch (error) {
                 console.error("Error loading orders:", error);
             }
         },
-
         async selectOrder(order) {
             try {
                 const response = await axios.get(`/admin/order/${order.id}`, {
@@ -122,6 +142,11 @@ export default {
                 console.error("Error loading order details:", error);
             }
         },
+        formatStatus(status) {
+            return status.replace(/\b(\w)/g, (char) =>
+                char.toUpperCase().replace(/_/g, " ")
+            );
+        },
         formatPrice(price) {
             if (!price) return "Rp. 0";
             const val = (price / 1).toFixed(0).replace(".", ",");
@@ -132,7 +157,6 @@ export default {
         closeModal() {
             this.isOrderDetailModalVisible = false;
         },
-
         showCreateModal() {
             console.log("Show create order modal");
         },
@@ -227,6 +251,26 @@ export default {
 .number-column {
     width: 5px;
     text-align: center;
+}
+
+.status-shape {
+    display: inline-block;
+    padding: 5px 10px;
+    font-weight: bold;
+    border-radius: 8px;
+    color: white;
+}
+
+.status-canceled {
+    background-color: red;
+}
+
+.status-pending {
+    background-color: grey;
+}
+
+.status-completed {
+    background-color: green;
 }
 
 .modal-backdrop {

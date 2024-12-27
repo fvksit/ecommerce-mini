@@ -16,7 +16,7 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        $orders = Order::with('user')->get();
+        $orders = Order::with('user')->orderBy('created_at', 'desc')->get();
         return OrderResource::collection($orders);
     }
 
