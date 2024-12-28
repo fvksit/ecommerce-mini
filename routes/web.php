@@ -12,6 +12,7 @@ use App\Http\Controllers\ProductImageController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UpdatedController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Storage;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,11 @@ Route::name('admin.')->prefix('admin')->group(function () {
 
         Route::resource('/order', OrderController::class)->only(['index', 'create', 'show']);
     });
+
+    Route::get('storage/{file}', function ($file) {
+        return Storage::get($file);
+    });
+
 
     Route::get('/{any}', function () {
         return view('welcome');
