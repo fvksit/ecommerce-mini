@@ -32,6 +32,11 @@
                 errors.general
             }}</span>
         </form>
+        <br />
+        <p class="register-link">
+            Don't have an account?
+            <router-link to="/admin/register-admin">Register here</router-link>
+        </p>
     </div>
 </template>
 
@@ -66,7 +71,6 @@ export default {
                     password: this.password,
                 });
 
-                // Assuming the response contains user role data
                 if (response.data.role !== "admin") {
                     this.errors = {
                         general: "Unauthorized access. Admins only.",
@@ -76,9 +80,7 @@ export default {
                     return;
                 }
 
-                // Assuming the token is in the response data
                 localStorage.setItem("token", response.data.token);
-                console.log("Login successful. Token saved.");
                 this.$router.push({ name: "admin.dashboard" });
             } catch (error) {
                 if (error.response && error.response.status === 422) {
@@ -90,6 +92,9 @@ export default {
                 }
                 console.error("Login failed:", this.errors);
             }
+        },
+        navigateToRegister() {
+            this.$router.push({ name: "admin.register" });
         },
     },
 };
@@ -163,6 +168,14 @@ input[type="text"] {
 
 .btn-login:hover {
     background-color: #0056b3;
+}
+
+.register-link button {
+    background: none;
+    color: #007bff;
+    border: none;
+    padding: 0;
+    cursor: pointer;
 }
 
 .error-message {

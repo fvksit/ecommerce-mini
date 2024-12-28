@@ -9,6 +9,7 @@ use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProductImageController;
+use App\Http\Controllers\RegisterAdminController;
 use App\Http\Controllers\RegisterController;
 use App\Http\Controllers\UpdatedController;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,7 @@ use Illuminate\Support\Facades\Storage;
 
 Route::name('admin.')->prefix('admin')->group(function () {
     Route::post('/login', LoginController::class)->name('login.store');
+    Route::post('/register-admin', RegisterAdminController::class);
 
     Route::middleware(['auth:sanctum', 'admin'])->group(function () {
         Route::post('/logout', LogoutController::class)->name('logout');

@@ -1,6 +1,5 @@
 <template>
     <div id="app">
-        <!-- Router View to display the component based on the route -->
         <main class="app-main">
             <router-view></router-view>
         </main>
@@ -33,7 +32,6 @@ export default {
                         },
                     }
                 );
-                // Remove token from localStorage after successful logout
                 localStorage.removeItem("token");
                 this.$router.push({ name: "admin.login" });
             } catch (error) {
@@ -48,7 +46,6 @@ export default {
 </script>
 
 <style scoped>
-/* General Styling */
 body {
     font-family: "Arial", sans-serif;
     margin: 0;
@@ -56,7 +53,6 @@ body {
     box-sizing: border-box;
 }
 
-/* Header Styling */
 .app-header {
     background-color: #007bff;
     padding: 10px 20px;
