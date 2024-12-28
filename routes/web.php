@@ -54,7 +54,6 @@ Route::name('admin.')->prefix('admin')->group(function () {
         return Storage::get($file);
     });
 
-
     Route::get('/{any}', function () {
         return view('welcome');
     })->where('any', '.*');
