@@ -24,11 +24,13 @@
                                 class="form-control"
                                 v-model="formData.name"
                                 required
+                                maxlength="255"
                             />
                             <div v-if="errors.name" class="text-danger">
                                 {{ errors.name[0] }}
                             </div>
                         </div>
+
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input
@@ -37,11 +39,13 @@
                                 v-model="formData.email"
                                 :disabled="emailDisabled"
                                 required
+                                maxlength="255"
                             />
                             <div v-if="errors.email" class="text-danger">
                                 {{ errors.email[0] }}
                             </div>
                         </div>
+
                         <button type="submit" class="btn btn-primary">
                             Update
                         </button>
@@ -64,16 +68,37 @@ export default {
         return {
             formData: { ...this.user },
             errors: {},
-            emailDisabled: false, // Email disabled by default unless the user is updating it
+            emailDisabled: false,
         };
     },
     methods: {
-        // Close the modal
         closeModal() {
             this.$emit("close");
         },
 
-        // Method to handle user update
+        validate() {
+            this.errors = {};
+            let isValid = true;
+
+            if (
+                !this.formData.name ||
+                this.formData.name.length < 1 ||
+                this.formData.name.length > 255
+            ) {
+                this.errors.name = [
+                    "Name must be between 1 and 255 characters",
+                ];
+                isValid = false;
+            }
+
+            if (!this.formData.email || this.formData.email.length > 255) {
+                this.errors.email = ["Email must be less than 255 characters"];
+                isValid = false;
+            }
+
+            return isValid;
+        },
+
         async updateUser() {
             const token = localStorage.getItem("token");
             if (!token) {
@@ -81,8 +106,12 @@ export default {
                 return;
             }
 
+            if (!this.validate()) {
+                console.log("Form contains errors, please fix them.");
+                return;
+            }
+
             try {
-                // Tentukan data yang dikirimkan ke backend
                 const updatedData = {
                     name: this.formData.name,
                     email:
@@ -91,7 +120,6 @@ export default {
                             : this.user.email,
                 };
 
-                // Kirim permintaan PUT ke backend
                 const response = await axios.put(
                     `/admin/index/${this.user.id}`,
                     updatedData,
@@ -103,12 +131,10 @@ export default {
                     }
                 );
 
-                // Emit success
                 this.$emit("userUpdated");
                 this.closeModal();
             } catch (error) {
                 if (error.response && error.response.status === 422) {
-                    // Validation errors from backend
                     this.errors = error.response.data.errors || {};
                 } else {
                     console.error("Failed to update user:", error);
@@ -116,7 +142,6 @@ export default {
             }
         },
 
-        // Enable email input if email is being updated
         enableEmailEdit() {
             this.emailDisabled = false;
         },
@@ -124,7 +149,6 @@ export default {
     watch: {
         user: {
             handler(newUser) {
-                // Reset form data whenever a new user is selected
                 this.formData = { ...newUser };
                 this.errors = {};
             },

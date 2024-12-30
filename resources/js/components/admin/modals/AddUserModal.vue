@@ -20,7 +20,6 @@
                 </div>
                 <div class="modal-body">
                     <form @submit.prevent="submitForm">
-                        <!-- Name Input -->
                         <div class="mb-3">
                             <label for="name" class="form-label">Name</label>
                             <input
@@ -28,11 +27,15 @@
                                 class="form-control"
                                 id="name"
                                 v-model="name"
+                                :class="{ 'is-invalid': nameError }"
                                 required
+                                maxlength="255"
                             />
+                            <div class="invalid-feedback" v-if="nameError">
+                                Name is required.
+                            </div>
                         </div>
 
-                        <!-- Email Input -->
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
                             <input
@@ -40,11 +43,14 @@
                                 class="form-control"
                                 id="email"
                                 v-model="email"
+                                :class="{ 'is-invalid': emailError }"
                                 required
                             />
+                            <div class="invalid-feedback" v-if="emailError">
+                                Please enter a valid email address.
+                            </div>
                         </div>
 
-                        <!-- Password Input -->
                         <div class="mb-3">
                             <label for="password" class="form-label"
                                 >Password</label
@@ -55,6 +61,7 @@
                                     class="form-control"
                                     id="password"
                                     v-model="password"
+                                    :class="{ 'is-invalid': passwordError }"
                                     required
                                 />
                                 <i
@@ -64,9 +71,11 @@
                                     "
                                 ></i>
                             </div>
+                            <div class="invalid-feedback" v-if="passwordError">
+                                Password must be at least 8 characters long.
+                            </div>
                         </div>
 
-                        <!-- Password Confirmation Input -->
                         <div class="mb-3">
                             <label for="passwordConfirmation" class="form-label"
                                 >Confirm Password</label
@@ -77,6 +86,9 @@
                                     class="form-control"
                                     id="passwordConfirmation"
                                     v-model="passwordConfirmation"
+                                    :class="{
+                                        'is-invalid': passwordConfirmationError,
+                                    }"
                                     required
                                 />
                                 <i
@@ -88,10 +100,19 @@
                                     "
                                 ></i>
                             </div>
+                            <div
+                                class="invalid-feedback"
+                                v-if="passwordConfirmationError"
+                            >
+                                Passwords do not match.
+                            </div>
                         </div>
 
-                        <!-- Submit Button -->
-                        <button type="submit" class="btn btn-primary">
+                        <button
+                            type="submit"
+                            class="btn btn-primary"
+                            :disabled="!isFormValid"
+                        >
                             Add User
                         </button>
                     </form>
@@ -114,6 +135,11 @@ export default {
             passwordConfirmation: "",
             showPassword: false,
             showPasswordConfirmation: false,
+
+            nameError: false,
+            emailError: false,
+            passwordError: false,
+            passwordConfirmationError: false,
         };
     },
     computed: {
@@ -131,9 +157,31 @@ export default {
                 ? "fas fa-eye-slash"
                 : "fas fa-eye";
         },
+        isFormValid() {
+            return (
+                !this.nameError &&
+                !this.emailError &&
+                !this.passwordError &&
+                !this.passwordConfirmationError
+            );
+        },
     },
     methods: {
+        validateForm() {
+            this.nameError = !this.name;
+
+            const emailPattern =
+                /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+            this.emailError = !emailPattern.test(this.email);
+
+            this.passwordError = this.password.length < 8;
+
+            this.passwordConfirmationError =
+                this.password !== this.passwordConfirmation;
+        },
         async submitForm() {
+            this.validateForm();
+
             const newUser = {
                 name: this.name,
                 email: this.email,
@@ -149,7 +197,7 @@ export default {
                         )}`,
                     },
                 });
-                console.log("User added:", response.data);
+
                 this.$emit("userAdded");
                 this.clearForm();
                 const modal = Modal.getInstance(
@@ -170,6 +218,10 @@ export default {
             this.email = "";
             this.password = "";
             this.passwordConfirmation = "";
+            this.nameError = false;
+            this.emailError = false;
+            this.passwordError = false;
+            this.passwordConfirmationError = false;
         },
         handleClose() {
             const modal = Modal.getInstance(
