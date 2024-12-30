@@ -30,8 +30,13 @@
                                 class="form-control"
                                 id="categoryName"
                                 v-model="newCategory.name"
+                                :class="{ 'is-invalid': errors.name }"
                                 required
+                                maxlength="255"
                             />
+                            <div v-if="errors.name" class="invalid-feedback">
+                                {{ errors.name[0] }}
+                            </div>
                         </div>
                         <button type="submit" class="btn btn-primary">
                             Save
@@ -53,10 +58,35 @@ export default {
             newCategory: {
                 name: "",
             },
+            errors: {
+                name: null,
+            },
         };
     },
+    computed: {
+        hasErrors() {
+            return this.errors.name !== null;
+        },
+    },
     methods: {
+        validateCategoryName() {
+            this.errors.name = null;
+
+            if (this.newCategory.name.trim() === "") {
+                this.errors.name = ["Category name is required."];
+            } else if (this.newCategory.name.length > 255) {
+                this.errors.name = [
+                    "Category name cannot be more than 255 characters.",
+                ];
+            }
+        },
         async createCategory() {
+            this.validateCategoryName();
+
+            if (this.hasErrors) {
+                return;
+            }
+
             try {
                 const response = await axios.post(
                     "/admin/category",
@@ -82,7 +112,27 @@ export default {
             }
         },
     },
+    watch: {
+        "newCategory.name": function (newVal) {
+            if (newVal.length > 255) {
+                this.errors.name = [
+                    "Category name cannot be more than 255 characters.",
+                ];
+            } else {
+                this.errors.name = null;
+            }
+        },
+    },
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+.is-invalid {
+    border-color: #dc3545;
+}
+
+.invalid-feedback {
+    display: block;
+    color: #dc3545;
+}
+</style>
