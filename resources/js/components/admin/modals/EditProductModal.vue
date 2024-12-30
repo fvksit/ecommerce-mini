@@ -29,7 +29,11 @@
                                 id="editProductName"
                                 v-model="productData.name"
                                 required
+                                maxlength="255"
                             />
+                            <div v-if="errors.name" class="invalid-feedback">
+                                {{ errors.name[0] }}
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="editProductCategory" class="form-label"
@@ -43,6 +47,12 @@
                                 placeholder="Search categories..."
                                 required
                             />
+                            <div
+                                v-if="errors.category"
+                                class="invalid-feedback"
+                            >
+                                {{ errors.category }}
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label
@@ -56,6 +66,12 @@
                                 v-model="productData.description"
                                 required
                             ></textarea>
+                            <div
+                                v-if="errors.description"
+                                class="invalid-feedback"
+                            >
+                                {{ errors.description[0] }}
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="editProductPrice" class="form-label"
@@ -68,8 +84,10 @@
                                 v-model.number="productData.price"
                                 required
                                 min="1"
-                                step="0.01"
                             />
+                            <div v-if="errors.price" class="invalid-feedback">
+                                {{ errors.price[0] }}
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="editProductStock" class="form-label"
@@ -83,6 +101,9 @@
                                 required
                                 min="1"
                             />
+                            <div v-if="errors.stock" class="invalid-feedback">
+                                {{ errors.stock[0] }}
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Current Images</label>
@@ -133,7 +154,11 @@
                                 id="editProductImages"
                                 multiple
                                 @change="handleFileUpload"
+                                accept="image/jpeg, image/png, image/gif, image/webp"
                             />
+                            <div v-if="errors.images" class="invalid-feedback">
+                                {{ errors.images[0] }}
+                            </div>
                             <div v-if="newImages.length" class="mt-2">
                                 <label class="form-label"
                                     >New Images Preview:</label
@@ -225,6 +250,7 @@ export default {
             newImages: [],
             deletedImageIds: [],
             isUpdating: false,
+            errors: {},
         };
     },
     watch: {
@@ -261,7 +287,54 @@ export default {
                     console.error("Error fetching categories:", error);
                 });
         },
+        validate() {
+            this.errors = {};
+
+            let isValid = true;
+
+            if (!this.productData.name || this.productData.name.length > 255) {
+                this.errors.name = "Name is required.";
+                isValid = false;
+            }
+
+            if (!this.productData.category || !this.productData.category.id) {
+                this.errors.category = "Category is required.";
+                isValid = false;
+            }
+
+            if (
+                !this.productData.description ||
+                this.productData.description.length > 1000
+            ) {
+                this.errors.description = "Description is required.";
+                isValid = false;
+            }
+
+            if (!this.productData.price || this.productData.price < 0) {
+                this.errors.price = "Price is required.";
+                isValid = false;
+            }
+
+            if (!this.productData.stock || this.productData.stock < 0) {
+                this.errors.stock = "Stock is required.";
+                isValid = false;
+            }
+
+            if (
+                this.newImages.length === 0 &&
+                this.deletedImageIds.length === 0
+            ) {
+                this.errors.images = "At least one image is required.";
+                isValid = false;
+            }
+
+            return isValid;
+        },
         async updateProduct() {
+            if (!this.validate()) {
+                return;
+            }
+
             this.isUpdating = true;
 
             try {
@@ -352,5 +425,8 @@ export default {
 </script>
 
 <style scoped>
-/* Optional: Add any component-specific styles here */
+.invalid-feedback {
+    display: block;
+    color: red;
+}
 </style>

@@ -29,7 +29,11 @@
                                 id="productName"
                                 v-model="newProduct.name"
                                 required
+                                maxlength="255"
                             />
+                            <div v-if="errors.name" class="invalid-feedback">
+                                {{ errors.name }}
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="productDescription" class="form-label"
@@ -41,7 +45,14 @@
                                 v-model="newProduct.description"
                                 rows="3"
                                 required
+                                maxlength="1000"
                             ></textarea>
+                            <div
+                                v-if="errors.description"
+                                class="invalid-feedback"
+                            >
+                                {{ errors.description }}
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="productPrice" class="form-label"
@@ -53,7 +64,11 @@
                                 id="productPrice"
                                 v-model="newProduct.price"
                                 required
+                                min="1"
                             />
+                            <div v-if="errors.price" class="invalid-feedback">
+                                {{ errors.price }}
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="productStock" class="form-label"
@@ -65,7 +80,11 @@
                                 id="productStock"
                                 v-model="newProduct.stock"
                                 required
+                                min="1"
                             />
+                            <div v-if="errors.stock" class="invalid-feedback">
+                                {{ errors.stock }}
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="productCategory" class="form-label"
@@ -79,6 +98,12 @@
                                 placeholder="Search categories..."
                                 required
                             />
+                            <div
+                                v-if="errors.category_id"
+                                class="invalid-feedback"
+                            >
+                                {{ errors.category_id }}
+                            </div>
                         </div>
                         <div class="mb-3">
                             <label for="productImages" class="form-label"
@@ -90,7 +115,12 @@
                                 id="productImages"
                                 multiple
                                 @change="handleFileUpload"
+                                required
+                                accept="image/jpeg, image/png, image/gif, image/webp"
                             />
+                            <div v-if="errors.images" class="invalid-feedback">
+                                {{ errors.images }}
+                            </div>
                             <div
                                 v-if="imagePreviews.length > 0"
                                 class="d-flex flex-wrap gap-2 mt-2"
@@ -158,6 +188,7 @@ export default {
             newImages: [],
             imagePreviews: [],
             showModal: false,
+            errors: {},
         };
     },
     async created() {
@@ -187,8 +218,25 @@ export default {
     methods: {
         handleFileUpload(event) {
             const files = Array.from(event.target.files);
-            this.newImages.push(...files);
-            this.updateImagePreviews();
+            const validExtensions = [
+                "image/jpeg",
+                "image/png",
+                "image/gif",
+                "image/webp",
+            ];
+            const invalidFiles = files.filter(
+                (file) => !validExtensions.includes(file.type)
+            );
+
+            if (invalidFiles.length > 0) {
+                this.newImages = [];
+                this.errors.images = "Invalid image format.";
+                return;
+            } else {
+                this.errors.images = "";
+                this.newImages.push(...files);
+                this.updateImagePreviews();
+            }
         },
         updateImagePreviews() {
             this.imagePreviews = this.newImages.map((image) =>
@@ -199,7 +247,51 @@ export default {
             this.newImages.splice(index, 1);
             this.updateImagePreviews();
         },
+        validate() {
+            this.errors = {};
+
+            let isValid = true;
+
+            if (!this.newProduct.name || this.newProduct.name.length > 255) {
+                this.errors.name = "Name is required.";
+                isValid = false;
+            }
+
+            if (
+                !this.newProduct.description ||
+                this.newProduct.description.length > 1000
+            ) {
+                this.errors.description = "Description is required";
+                isValid = false;
+            }
+
+            if (!this.newProduct.price || this.newProduct.price < 0) {
+                this.errors.price = "Price must be greater than 0";
+                isValid = false;
+            }
+
+            if (!this.newProduct.stock || this.newProduct.stock < 0) {
+                this.errors.stock = "Stock must be greater than 0";
+                isValid = false;
+            }
+
+            if (!this.newProduct.category_id) {
+                this.errors.category_id = "Category is required.";
+                isValid = false;
+            }
+
+            if (this.newImages.length === 0) {
+                this.errors.images = "At least one image is required.";
+                isValid = false;
+            }
+
+            return isValid;
+        },
         async storeProduct() {
+            if (!this.validate()) {
+                return;
+            }
+
             try {
                 const formData = new FormData();
                 formData.append("name", this.newProduct.name);
@@ -238,6 +330,8 @@ export default {
                 category_id: null,
                 images: [],
             };
+            this.newImages = [];
+            this.imagePreviews = [];
             this.searchTerm = "";
         },
         closeModal() {
@@ -250,4 +344,13 @@ export default {
 };
 </script>
 
-<style></style>
+<style scoped>
+.is-invalid {
+    border-color: #dc3545;
+}
+
+.invalid-feedback {
+    display: block;
+    color: #dc3545;
+}
+</style>

@@ -78,7 +78,6 @@ export default {
     methods: {
         getImageUrl(imagePath) {
             const url = `${import.meta.env.VITE_API_URL}/storage/${imagePath}`;
-            console.log("Generated Image URL:", url);
             return url;
         },
         formatPrice(price) {
