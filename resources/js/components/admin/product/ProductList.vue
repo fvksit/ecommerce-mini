@@ -134,7 +134,12 @@ export default {
                         )}`,
                     },
                 });
-                this.products = response.data.data;
+                this.products = response.data.data.map((product) => {
+                    if (!product.category) {
+                        product.category = { name: "No Category" };
+                    }
+                    return product;
+                });
                 this.$nextTick(() => {
                     $("#products-table").DataTable();
                 });
