@@ -27,7 +27,7 @@
                                 maxlength="255"
                             />
                             <div v-if="errors.name" class="text-danger">
-                                {{ errors.name[0] }}
+                                {{ errors.name }}
                             </div>
                         </div>
 
@@ -42,7 +42,7 @@
                                 maxlength="255"
                             />
                             <div v-if="errors.email" class="text-danger">
-                                {{ errors.email[0] }}
+                                {{ errors.email }}
                             </div>
                         </div>
 

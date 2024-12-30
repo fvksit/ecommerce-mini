@@ -35,7 +35,7 @@
                                 maxlength="255"
                             />
                             <div v-if="errors.name" class="invalid-feedback">
-                                {{ errors.name[0] }}
+                                {{ errors.name }}
                             </div>
                         </div>
                         <button type="submit" class="btn btn-primary">

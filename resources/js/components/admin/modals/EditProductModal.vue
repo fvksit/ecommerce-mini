@@ -32,7 +32,7 @@
                                 maxlength="255"
                             />
                             <div v-if="errors.name" class="invalid-feedback">
-                                {{ errors.name[0] }}
+                                {{ errors.name }}
                             </div>
                         </div>
                         <div class="mb-3">
@@ -70,7 +70,7 @@
                                 v-if="errors.description"
                                 class="invalid-feedback"
                             >
-                                {{ errors.description[0] }}
+                                {{ errors.description }}
                             </div>
                         </div>
                         <div class="mb-3">
@@ -86,7 +86,7 @@
                                 min="1"
                             />
                             <div v-if="errors.price" class="invalid-feedback">
-                                {{ errors.price[0] }}
+                                {{ errors.price }}
                             </div>
                         </div>
                         <div class="mb-3">
@@ -102,7 +102,7 @@
                                 min="1"
                             />
                             <div v-if="errors.stock" class="invalid-feedback">
-                                {{ errors.stock[0] }}
+                                {{ errors.stock }}
                             </div>
                         </div>
                         <div class="mb-3">
@@ -157,7 +157,7 @@
                                 accept="image/jpeg, image/png, image/gif, image/webp"
                             />
                             <div v-if="errors.images" class="invalid-feedback">
-                                {{ errors.images[0] }}
+                                {{ errors.images }}
                             </div>
                             <div v-if="newImages.length" class="mt-2">
                                 <label class="form-label"
