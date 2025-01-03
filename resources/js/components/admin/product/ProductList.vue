@@ -268,8 +268,10 @@ export default {
     margin: 0 auto;
     border-collapse: collapse;
 }
-.dt-center {
-    text-align: center;
+
+#products-table th,
+#products-table td {
+    text-align: left;
 }
 
 .content {

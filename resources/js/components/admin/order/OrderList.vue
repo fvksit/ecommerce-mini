@@ -165,7 +165,6 @@ export default {
 </script>
 
 <style scoped>
-/* Optional: Add scoped styles for this page */
 .dashboard-container {
     display: flex;
     flex-direction: column;
@@ -236,8 +235,10 @@ export default {
     margin: 0 auto;
     border-collapse: collapse;
 }
-.dt-center {
-    text-align: center;
+
+#corders-table th,
+#orders-table td {
+    text-align: left;
 }
 
 .content {

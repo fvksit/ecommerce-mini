@@ -72,15 +72,18 @@ export default {
     methods: {
         formatDate(date) {
             if (!date) return "-";
+
             const options = {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
-                hour: "numeric",
-                minute: "numeric",
-                second: "numeric",
+                hour: "2-digit",
+                minute: "2-digit",
+                second: "2-digit",
+                timeZone: "Asia/Jakarta",
+                timeZoneName: "short",
             };
-            return new Date(date).toLocaleDateString("en-US", options);
+            return new Date(date).toLocaleDateString("id-ID", options);
         },
         formatStatus(status) {
             return status.replace(/\b(\w)/g, (char) =>

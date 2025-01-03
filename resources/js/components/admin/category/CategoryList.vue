@@ -231,13 +231,15 @@ export default {
     z-index: -1;
 }
 
-#users-table {
+#categories-table {
     width: 100%;
     margin: 0 auto;
     border-collapse: collapse;
 }
-.dt-center {
-    text-align: center;
+
+#categories-table th,
+#categories-table td {
+    text-align: left;
 }
 
 .content {

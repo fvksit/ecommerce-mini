@@ -131,34 +131,37 @@ export default {
                 });
 
                 this.users = response.data.users;
-                this.initDataTable();
+                // this.initDataTable();
+                this.$nextTick(() => {
+                    $("#users-table").DataTable();
+                });
             } catch (error) {
                 console.error("Failed to fetch users:", error);
             }
         },
-        initDataTable() {
-            this.$nextTick(() => {
-                if ($.fn.dataTable.isDataTable("#users-table")) {
-                    $("#users-table").DataTable().destroy();
-                }
+        // initDataTable() {
+        //     this.$nextTick(() => {
+        //         if ($.fn.dataTable.isDataTable("#users-table")) {
+        //             $("#users-table").DataTable().destroy();
+        //         }
 
-                $("#users-table").DataTable({
-                    dom:
-                        '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
-                        '<"row"<"col-sm-12"tr>>' +
-                        '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
-                    pagingType: "simple_numbers",
-                    language: {
-                        search: "_INPUT_",
-                        searchPlaceholder: "Search...",
-                    },
-                    responsive: true,
-                    autoWidth: false,
-                    lengthMenu: [10, 50, 100],
-                    columnDefs: [{ targets: "_all", className: "dt-center" }],
-                });
-            });
-        },
+        //         $("#users-table").DataTable({
+        //             dom:
+        //                 '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
+        //                 '<"row"<"col-sm-12"tr>>' +
+        //                 '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
+        //             pagingType: "simple_numbers",
+        //             language: {
+        //                 search: "_INPUT_",
+        //                 searchPlaceholder: "Search...",
+        //             },
+        //             responsive: true,
+        //             autoWidth: false,
+        //             lengthMenu: [10, 50, 100],
+        //             columnDefs: [{ targets: "_all", className: "dt-center" }],
+        //         });
+        //     });
+        // },
         async showDetail(userId) {
             const token = localStorage.getItem("token");
             if (!token) {
@@ -264,8 +267,10 @@ export default {
     margin: 0 auto;
     border-collapse: collapse;
 }
-.dt-center {
-    text-align: center;
+
+#users-table th,
+#users-table td {
+    text-align: left;
 }
 
 .content {
