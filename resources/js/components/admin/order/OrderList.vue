@@ -168,17 +168,6 @@ export default {
 .dashboard-container {
     display: flex;
     flex-direction: column;
-}
-
-.main-content {
-    padding: 20px;
-}
-</style>
-
-<style scoped>
-.dashboard-container {
-    display: flex;
-    flex-direction: column;
     height: 100vh;
     overflow: hidden;
 }
@@ -235,10 +224,8 @@ export default {
     margin: 0 auto;
     border-collapse: collapse;
 }
-
-#corders-table th,
-#orders-table td {
-    text-align: left;
+.dt-center {
+    text-align: center;
 }
 
 .content {
