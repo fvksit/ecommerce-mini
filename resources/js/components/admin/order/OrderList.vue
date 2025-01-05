@@ -82,10 +82,9 @@
 </template>
 
 <script>
-import axios from "axios";
+import { getOrders, getOrderById } from "../services/orderService";
 import $ from "jquery";
-import "datatables.net";
-import "datatables.net-bs5";
+import "datatables.net-responsive";
 import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 import OrderDetailModal from "../modals/DetailOrderModal.vue";
 import Navbar from "../navbar/Navbar.vue";
@@ -106,19 +105,14 @@ export default {
         };
     },
     mounted() {
-        this.loadOrders();
+        if (this.isLoggedIn) {
+            this.loadOrders();
+        }
     },
     methods: {
         async loadOrders() {
             try {
-                const response = await axios.get("/admin/order", {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem(
-                            "token"
-                        )}`,
-                    },
-                });
-                this.orders = response.data.data;
+                this.orders = await getOrders();
                 this.$nextTick(() => {
                     $("#orders-table").DataTable();
                 });
@@ -126,17 +120,11 @@ export default {
                 console.error("Error loading orders:", error);
             }
         },
+
         async selectOrder(order) {
             try {
-                const response = await axios.get(`/admin/order/${order.id}`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem(
-                            "token"
-                        )}`,
-                        Accept: "application/json",
-                    },
-                });
-                this.selectedOrder = response.data.data;
+                const response = await getOrderById(order.id);
+                this.selectedOrder = response.data;
                 this.isOrderDetailModalVisible = true;
             } catch (error) {
                 console.error("Error loading order details:", error);

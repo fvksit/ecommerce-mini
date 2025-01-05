@@ -69,7 +69,6 @@
                         v-if="showDetailModal"
                         @close="showDetailModal = false"
                     />
-
                     <ModalUpdate
                         :user="selectedUser"
                         v-if="showUpdateModal"
@@ -86,12 +85,8 @@
 </template>
 
 <script>
-import axios from "axios";
+import { fetchUsers, fetchUserDetails } from "./services/userService";
 import $ from "jquery";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
-import "datatables.net-bs5";
 import AddUserModal from "./modals/AddUserModal.vue";
 import ModalDetail from "./modals/DetailUserModal.vue";
 import ModalUpdate from "./modals/UpdateUserModal.vue";
@@ -118,20 +113,8 @@ export default {
     methods: {
         async fetchUsers() {
             const token = localStorage.getItem("token");
-            if (!token) {
-                console.error("No token found. Unable to fetch users.");
-                return;
-            }
             try {
-                const response = await axios.get("/admin/index", {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        Accept: "application/json",
-                    },
-                });
-
-                this.users = response.data.users;
-                // this.initDataTable();
+                this.users = await fetchUsers(token);
                 this.$nextTick(() => {
                     $("#users-table").DataTable();
                 });
@@ -139,43 +122,10 @@ export default {
                 console.error("Failed to fetch users:", error);
             }
         },
-        // initDataTable() {
-        //     this.$nextTick(() => {
-        //         if ($.fn.dataTable.isDataTable("#users-table")) {
-        //             $("#users-table").DataTable().destroy();
-        //         }
-
-        //         $("#users-table").DataTable({
-        //             dom:
-        //                 '<"row"<"col-sm-12 col-md-6"l><"col-sm-12 col-md-6"f>>' +
-        //                 '<"row"<"col-sm-12"tr>>' +
-        //                 '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>',
-        //             pagingType: "simple_numbers",
-        //             language: {
-        //                 search: "_INPUT_",
-        //                 searchPlaceholder: "Search...",
-        //             },
-        //             responsive: true,
-        //             autoWidth: false,
-        //             lengthMenu: [10, 50, 100],
-        //             columnDefs: [{ targets: "_all", className: "dt-center" }],
-        //         });
-        //     });
-        // },
         async showDetail(userId) {
             const token = localStorage.getItem("token");
-            if (!token) {
-                console.error("No token found. Unable to fetch user details.");
-                return;
-            }
             try {
-                const response = await axios.get(`/admin/index/${userId}`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                        Accept: "application/json",
-                    },
-                });
-                this.selectedUser = response.data.data;
+                this.selectedUser = await fetchUserDetails(userId, token);
                 this.showDetailModal = true;
             } catch (error) {
                 console.error("Failed to fetch user details:", error);
@@ -185,24 +135,11 @@ export default {
             this.selectedUser = user;
             this.showUpdateModal = true;
         },
-        drawCanvas() {
-            const canvas = document.getElementById("background-canvas");
-            const context = canvas.getContext("2d");
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-            context.fillStyle = "rgba(200, 200, 200, 0.2)";
-            context.fillRect(0, 0, canvas.width, canvas.height);
-        },
     },
     mounted() {
         if (this.isLoggedIn) {
             this.fetchUsers();
-            this.drawCanvas();
-            window.addEventListener("resize", this.drawCanvas);
         }
-    },
-    beforeDestroy() {
-        window.removeEventListener("resize", this.drawCanvas);
     },
 };
 </script>

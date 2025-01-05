@@ -67,13 +67,15 @@
             <span v-if="errors.general" class="error-message">{{
                 errors.general[0]
             }}</span>
-            <button type="submit" class="btn-register">Register</button>
+            <button type="submit" class="btn-register" :disabled="loading">
+                Register
+            </button>
         </form>
     </div>
 </template>
 
 <script>
-import axios from "axios";
+import { registerAdmin } from "../services/authService";
 
 export default {
     data() {
@@ -86,6 +88,7 @@ export default {
             showPasswordConfirmation: false,
             errors: {},
             successMessage: "",
+            loading: false,
         };
     },
     computed: {
@@ -115,19 +118,22 @@ export default {
         async register() {
             this.errors = {};
             this.successMessage = "";
+            this.loading = true;
+
             try {
-                const response = await axios.post("/admin/register-admin", {
-                    name: this.name,
-                    email: this.email,
-                    password: this.password,
-                    password_confirmation: this.passwordConfirmation,
-                    role: "admin",
-                });
-                this.successMessage = "Registration successful";
+                const response = await registerAdmin(
+                    this.name,
+                    this.email,
+                    this.password,
+                    this.passwordConfirmation
+                );
+
+                this.successMessage = "Registration successful!";
                 setTimeout(() => {
                     this.$router.push({ name: "admin.login" });
                 }, 2000);
             } catch (error) {
+                this.loading = false;
                 if (error.response && error.response.data.errors) {
                     this.errors = error.response.data.errors;
                 } else {

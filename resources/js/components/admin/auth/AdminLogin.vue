@@ -27,7 +27,9 @@
                     errors.password[0]
                 }}</span>
             </div>
-            <button type="submit" class="btn-login">Login</button>
+            <button type="submit" class="btn-login" :disabled="loading">
+                Login
+            </button>
             <span v-if="errors.general" class="error-message">{{
                 errors.general
             }}</span>
@@ -41,7 +43,7 @@
 </template>
 
 <script>
-import axios from "axios";
+import { login } from "../services/authService";
 
 export default {
     data() {
@@ -50,6 +52,7 @@ export default {
             password: "",
             showPassword: false,
             errors: {},
+            loading: false,
         };
     },
     computed: {
@@ -65,36 +68,26 @@ export default {
             this.showPassword = !this.showPassword;
         },
         async login() {
+            this.errors = {};
+            this.loading = true;
+
             try {
-                const response = await axios.post("/admin/login", {
-                    email: this.email,
-                    password: this.password,
-                });
+                await login(this.email, this.password);
 
-                if (response.data.role !== "admin") {
-                    this.errors = {
-                        general: "Unauthorized access. Admins only.",
-                    };
-                    localStorage.removeItem("token");
-                    window.location.href = "/admin/login";
-                    return;
-                }
-
-                localStorage.setItem("token", response.data.token);
                 this.$router.push({ name: "admin.dashboard" });
             } catch (error) {
+                this.loading = false;
+
                 if (error.response && error.response.status === 422) {
                     this.errors = error.response.data.errors || {};
+                } else if (error.message) {
+                    this.errors.general = error.message;
                 } else {
-                    this.errors = {
-                        general: "An error occurred. Please try again.",
-                    };
+                    this.errors.general =
+                        "An error occurred. Please try again.";
                 }
                 console.error("Login failed:", this.errors);
             }
-        },
-        navigateToRegister() {
-            this.$router.push({ name: "admin.register" });
         },
     },
 };

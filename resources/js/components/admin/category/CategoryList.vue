@@ -57,7 +57,6 @@
                         </table>
                     </div>
                     <CreateCategoryModal @categoryCreated="fetchCategories" />
-
                     <EditCategoryModal
                         :category="currentCategory"
                         @categoryUpdated="updateCategoryList"
@@ -72,12 +71,16 @@
 </template>
 
 <script>
-import axios from "axios";
+import {
+    fetchCategories,
+    createCategory,
+    updateCategory,
+    deleteCategory,
+} from "../services/categoryService";
 import { Modal } from "bootstrap";
 import $ from "jquery";
+import "datatables.net-responsive";
 import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
-import "datatables.net-bs5";
-import "datatables.net";
 
 import CreateCategoryModal from "../modals/CreateCategoryModal.vue";
 import EditCategoryModal from "../modals/EditCategoryModal.vue";
@@ -105,15 +108,9 @@ export default {
     },
     methods: {
         async fetchCategories() {
+            const token = localStorage.getItem("token");
             try {
-                const response = await axios.get("/admin/category", {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem(
-                            "token"
-                        )}`,
-                    },
-                });
-                this.categories = response.data.data;
+                this.categories = await fetchCategories(token);
                 this.initDataTable();
             } catch (error) {
                 console.error("Error fetching categories:", error);
@@ -152,25 +149,18 @@ export default {
             this.destroyDataTable();
             this.initDataTable();
         },
-        deleteCategory(id) {
-            axios
-                .delete(`/admin/category/${id}`, {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem(
-                            "token"
-                        )}`,
-                    },
-                })
-                .then(() => {
-                    this.categories = this.categories.filter(
-                        (category) => category.id !== id
-                    );
-                    this.destroyDataTable();
-                    this.initDataTable();
-                })
-                .catch((error) => {
-                    console.error("Error deleting category:", error);
-                });
+        async deleteCategory(id) {
+            const token = localStorage.getItem("token");
+            try {
+                await deleteCategory(id, token);
+                this.categories = this.categories.filter(
+                    (category) => category.id !== id
+                );
+                this.destroyDataTable();
+                this.initDataTable();
+            } catch (error) {
+                console.error("Error deleting category:", error);
+            }
         },
     },
 };

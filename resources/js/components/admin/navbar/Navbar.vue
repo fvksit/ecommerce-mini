@@ -44,7 +44,6 @@ export default {
                 } else {
                     console.error("loggedInUser is undefined in the response.");
                 }
-                this.users = response.data.users;
             } catch (error) {
                 console.error(
                     "Failed to fetch user name:",
@@ -52,12 +51,15 @@ export default {
                 );
             }
         },
+
         async logout() {
             const token = localStorage.getItem("token");
+
             if (!token) {
                 this.$router.push({ name: "admin.login" });
                 return;
             }
+
             try {
                 await axios.post(
                     "/admin/logout",
@@ -68,13 +70,16 @@ export default {
                         },
                     }
                 );
+
                 localStorage.removeItem("token");
+
                 this.$router.push({ name: "admin.login" });
             } catch (error) {
                 console.error(
                     "Logout failed:",
                     error.response?.data || error.message
                 );
+                alert("Logout failed. Please try again.");
             }
         },
     },

@@ -89,11 +89,14 @@
 </template>
 
 <script>
-import axios from "axios";
+import {
+    getProducts,
+    getProductById,
+    deleteProduct,
+} from "../services/productService";
 import $ from "jquery";
+import "datatables.net-responsive";
 import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
-import "datatables.net-bs5";
-import "datatables.net";
 import * as bootstrap from "bootstrap";
 
 import CreateProductModal from "../modals/CreateProductModal.vue";
@@ -127,14 +130,8 @@ export default {
     methods: {
         async fetchProducts() {
             try {
-                const response = await axios.get("/admin/product", {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem(
-                            "token"
-                        )}`,
-                    },
-                });
-                this.products = response.data.data.map((product) => {
+                const products = await getProducts();
+                this.products = products.map((product) => {
                     if (!product.category) {
                         product.category = { name: "No Category" };
                     }
@@ -154,33 +151,14 @@ export default {
             createModal.show();
         },
         async showDetail(productId) {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                console.error("No token found. Unable to fetch user details.");
-                return;
-            }
             try {
-                const response = await axios.get(
-                    `/admin/product/${productId}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${token}`,
-                            Accept: "application/json",
-                        },
-                    }
-                );
-                this.currentProduct = response.data.data;
+                this.currentProduct = await getProductById(productId);
                 this.showDetailModal = true;
             } catch (error) {
-                console.error("Failed to fetch user details:", error);
+                console.error("Error fetching product details:", error);
             }
         },
         showUpdateModal(product) {
-            const response = axios.get(`/admin/product/${product.id}`, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem("token")}`,
-                },
-            });
             this.currentProduct = product;
             const editModal = new bootstrap.Modal(
                 document.getElementById("editProductModal")
@@ -197,12 +175,15 @@ export default {
                 this.products.push(updatedProduct);
             }
         },
-        confirmDelete(productId) {
-            this.currentProductId = productId;
-            const deleteModal = new bootstrap.Modal(
-                document.getElementById("deleteProductModal")
-            );
-            deleteModal.show();
+        async confirmDelete(productId) {
+            try {
+                await deleteProduct(productId);
+                this.products = this.products.filter(
+                    (product) => product.id !== productId
+                );
+            } catch (error) {
+                console.error("Error deleting product:", error);
+            }
         },
     },
 };
