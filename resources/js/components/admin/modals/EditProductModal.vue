@@ -322,7 +322,7 @@ export default {
 
             if (
                 this.newImages.length === 0 &&
-                this.deletedImageIds.length === 0
+                this.productData.images.length === 0
             ) {
                 this.errors.images = "At least one image is required.";
                 isValid = false;
@@ -412,10 +412,34 @@ export default {
             this.newImages.splice(index, 1);
         },
         removeImage(image) {
+            if (!confirm("Are you sure you want to delete this image?")) {
+                return;
+            }
             this.deletedImageIds.push(image.id);
-            this.productData.images = this.productData.images.filter(
-                (img) => img.id !== image.id
-            );
+            axios
+                .delete(
+                    `/admin/product/${this.productData.id}/images/${image.id}`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${localStorage.getItem(
+                                "token"
+                            )}`,
+                        },
+                    }
+                )
+                .then(() => {
+                    this.productData.images = this.productData.images.filter(
+                        (img) => img.id !== image.id
+                    );
+                    this.validate();
+                })
+                .catch((error) => {
+                    console.error(
+                        "Failed to delete image:",
+                        error.response || error.message
+                    );
+                    alert("Failed to delete the image. Please try again.");
+                });
         },
         createObjectURL(image) {
             return URL.createObjectURL(image);

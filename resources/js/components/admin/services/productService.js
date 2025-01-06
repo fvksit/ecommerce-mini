@@ -90,3 +90,17 @@ export const uploadProductImage = async (productId, formData) => {
         throw error;
     }
 };
+
+export const deleteProductImage = async (productId, imageId) => {
+    try {
+        const response = await axios.delete(`${API_URL}/${productId}/images/${imageId}`, {
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error deleting product image:", error);
+        throw error;
+    }
+};

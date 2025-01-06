@@ -48,6 +48,7 @@ Route::name('admin.')->prefix('admin')->group(function () {
 
         Route::resource('/product', ProductController::class);
         Route::post('/product/{product}/images', [ProductImageController::class, 'store']);
+        Route::delete('/product/{product}/images/{image}', [ProductImageController::class, 'destroy']);
 
         Route::resource('/order', OrderController::class)->only(['index', 'create', 'show']);
     });
