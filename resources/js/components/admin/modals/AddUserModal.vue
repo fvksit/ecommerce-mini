@@ -108,6 +108,10 @@
                             </div>
                         </div>
 
+                        <div v-if="globalError" class="alert alert-danger">
+                            {{ globalError }}
+                        </div>
+
                         <button
                             type="submit"
                             class="btn btn-primary"
@@ -140,6 +144,7 @@ export default {
             emailError: false,
             passwordError: false,
             passwordConfirmationError: false,
+            globalError: "",
         };
     },
     computed: {
@@ -158,12 +163,7 @@ export default {
                 : "fas fa-eye";
         },
         isFormValid() {
-            return (
-                !this.nameError &&
-                !this.emailError &&
-                !this.passwordError &&
-                !this.passwordConfirmationError
-            );
+            return !this.nameError && !this.emailError;
         },
     },
     methods: {
@@ -175,12 +175,24 @@ export default {
             this.emailError = !emailPattern.test(this.email);
 
             this.passwordError = this.password.length < 8;
-
             this.passwordConfirmationError =
                 this.password !== this.passwordConfirmation;
+
+            if (this.passwordError) {
+                this.globalError =
+                    "Password must be at least 8 characters long.";
+            } else if (this.passwordConfirmationError) {
+                this.globalError = "Passwords do not match.";
+            } else {
+                this.globalError = "";
+            }
         },
         async submitForm() {
             this.validateForm();
+
+            if (this.passwordError || this.passwordConfirmationError) {
+                return;
+            }
 
             const newUser = {
                 name: this.name,
@@ -188,6 +200,7 @@ export default {
                 password: this.password,
                 password_confirmation: this.passwordConfirmation,
             };
+
             try {
                 const response = await axios.post("/admin/register", newUser, {
                     headers: {
@@ -222,6 +235,7 @@ export default {
             this.emailError = false;
             this.passwordError = false;
             this.passwordConfirmationError = false;
+            this.globalError = "";
         },
         handleClose() {
             const modal = Modal.getInstance(

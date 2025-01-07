@@ -11,7 +11,7 @@
                             data-bs-toggle="modal"
                             data-bs-target="#addUserModal"
                         >
-                            Add User
+                            <i class="fas fa-plus"></i> Add User
                         </button>
                     </div>
                     <canvas id="background-canvas"></canvas>
@@ -87,6 +87,8 @@
 <script>
 import { fetchUsers, fetchUserDetails } from "./services/userService";
 import $ from "jquery";
+import "datatables.net-responsive";
+import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
 import AddUserModal from "./modals/AddUserModal.vue";
 import ModalDetail from "./modals/DetailUserModal.vue";
 import ModalUpdate from "./modals/UpdateUserModal.vue";
