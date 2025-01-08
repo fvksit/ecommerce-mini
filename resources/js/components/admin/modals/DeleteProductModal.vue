@@ -68,10 +68,11 @@ export default {
     },
     methods: {
         showModal() {
-            this.isModalVisible = true;
+            const modalElement = document.getElementById("deleteProductModal");
+            const modal = new Modal(modalElement);
+            modal.show();
         },
         hideModal() {
-            this.isModalVisible = false;
             const modalElement = document.getElementById("deleteProductModal");
             const modal = Modal.getInstance(modalElement);
             modal.hide();
@@ -91,7 +92,7 @@ export default {
                 setTimeout(() => {
                     this.hideModal();
                     this.successMessage = "";
-                }, 3000);
+                }, 2000);
             } catch (error) {
                 console.error("Error deleting product:", error);
             }

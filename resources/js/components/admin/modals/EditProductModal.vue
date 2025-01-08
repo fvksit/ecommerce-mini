@@ -43,7 +43,6 @@
                                 v-model="productData.category"
                                 :options="categories"
                                 label="name"
-                                :reduce="(category) => category.id"
                                 placeholder="Search categories..."
                                 required
                             />
@@ -82,8 +81,8 @@
                                 class="form-control"
                                 id="editProductPrice"
                                 v-model.number="productData.price"
-                                required
                                 min="1"
+                                max="1000000000000"
                             />
                             <div v-if="errors.price" class="invalid-feedback">
                                 {{ errors.price }}
@@ -98,8 +97,8 @@
                                 class="form-control"
                                 id="editProductStock"
                                 v-model.number="productData.stock"
-                                required
                                 min="1"
+                                max="1000000000000"
                             />
                             <div v-if="errors.stock" class="invalid-feedback">
                                 {{ errors.stock }}
@@ -197,6 +196,7 @@
                             type="button"
                             class="btn btn-secondary"
                             data-bs-dismiss="modal"
+                            @click="reloadPage"
                         >
                             Close
                         </button>
@@ -224,6 +224,7 @@
 import axios from "axios";
 import { Modal } from "bootstrap";
 import VSelect from "vue-select";
+import { deleteProductImage } from "../services/productService";
 
 export default {
     props: {
@@ -320,14 +321,6 @@ export default {
                 isValid = false;
             }
 
-            if (
-                this.newImages.length === 0 &&
-                this.productData.images.length === 0
-            ) {
-                this.errors.images = "At least one image is required.";
-                isValid = false;
-            }
-
             return isValid;
         },
         async updateProduct() {
@@ -342,6 +335,10 @@ export default {
 
                 if (this.newImages.length > 0) {
                     await this.insertNewImages();
+                }
+
+                if (this.deletedImageIds.length > 0) {
+                    await this.deleteImage();
                 }
 
                 this.$emit("productUpdated", this.productData);
@@ -416,33 +413,30 @@ export default {
                 return;
             }
             this.deletedImageIds.push(image.id);
-            axios
-                .delete(
-                    `/admin/product/${this.productData.id}/images/${image.id}`,
-                    {
-                        headers: {
-                            Authorization: `Bearer ${localStorage.getItem(
-                                "token"
-                            )}`,
-                        },
-                    }
-                )
-                .then(() => {
-                    this.productData.images = this.productData.images.filter(
-                        (img) => img.id !== image.id
-                    );
-                    this.validate();
-                })
-                .catch((error) => {
-                    console.error(
-                        "Failed to delete image:",
-                        error.response || error.message
-                    );
-                    alert("Failed to delete the image. Please try again.");
-                });
+            this.productData.images = this.productData.images.filter(
+                (img) => img.id !== image.id
+            );
+            this.validate();
+        },
+        deleteImage() {
+            this.deletedImageIds.forEach((imageId) => {
+                deleteProductImage(this.productData.id, imageId)
+                    .then(() => {
+                        console.log(`Image ${imageId} deleted successfully`);
+                    })
+                    .catch((error) => {
+                        console.error(
+                            `Failed to delete image ${imageId}:`,
+                            error
+                        );
+                    });
+            });
         },
         createObjectURL(image) {
             return URL.createObjectURL(image);
+        },
+        reloadPage() {
+            window.location.reload();
         },
     },
 };

@@ -63,8 +63,8 @@
                                 class="form-control"
                                 id="productPrice"
                                 v-model="newProduct.price"
-                                required
                                 min="1"
+                                max="1000000000000"
                             />
                             <div v-if="errors.price" class="invalid-feedback">
                                 {{ errors.price }}
@@ -79,8 +79,8 @@
                                 class="form-control"
                                 id="productStock"
                                 v-model="newProduct.stock"
-                                required
                                 min="1"
+                                max="1000000000000"
                             />
                             <div v-if="errors.stock" class="invalid-feedback">
                                 {{ errors.stock }}

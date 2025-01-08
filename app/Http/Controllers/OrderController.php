@@ -41,8 +41,10 @@ class OrderController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Order $order)
+    public function show($id)
     {
+        $order = Order::with('products')->findOrFail($id);
+
         return new OrderResource($order->load('products'));
     }
 

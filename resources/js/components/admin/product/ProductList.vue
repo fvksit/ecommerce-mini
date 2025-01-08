@@ -65,12 +65,16 @@
                             </tbody>
                         </table>
                     </div>
-                    <CreateProductModal @productCreated="fetchProducts" />
+                    <CreateProductModal
+                        ref="createProductModal"
+                        @productCreated="fetchProducts"
+                    />
                     <EditProductModal
                         :product="currentProduct"
                         @productUpdated="onProductUpdated"
                     />
                     <DeleteProductModal
+                        ref="deleteProductModal"
                         :productId="currentProductId"
                         @productDeleted="fetchProducts"
                     />
@@ -97,6 +101,9 @@ import {
 import $ from "jquery";
 import "datatables.net-responsive";
 import "datatables.net-bs5/css/dataTables.bootstrap5.min.css";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import "bootstrap";
 import * as bootstrap from "bootstrap";
 
 import CreateProductModal from "../modals/CreateProductModal.vue";
@@ -177,10 +184,9 @@ export default {
         },
         async confirmDelete(productId) {
             try {
-                await deleteProduct(productId);
-                this.products = this.products.filter(
-                    (product) => product.id !== productId
-                );
+                this.currentProductId = productId;
+                const deleteModal = this.$refs.deleteProductModal;
+                deleteModal.showModal();
             } catch (error) {
                 console.error("Error deleting product:", error);
             }

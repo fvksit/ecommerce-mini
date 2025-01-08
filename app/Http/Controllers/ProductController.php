@@ -99,11 +99,11 @@ class ProductController extends Controller
     public function destroy(Product $product)
     {
         try {
-            $product->images()->delete();
             $product->delete();
 
             return response()->noContent();
         } catch (\Exception $e) {
+            Log::error('Error soft deleting product: ' . $e->getMessage());
             return response()->json([
                 'error' => 'Failed to delete product',
                 'message' => $e->getMessage()
