@@ -15,6 +15,7 @@
                         class="btn-close"
                         data-bs-dismiss="modal"
                         aria-label="Close"
+                        @click="reloadPage"
                     ></button>
                 </div>
                 <form @submit.prevent="updateProduct">
@@ -403,7 +404,13 @@ export default {
             return url;
         },
         handleFileUpload(event) {
-            this.newImages = Array.from(event.target.files);
+            const files = Array.from(event.target.files);
+            const maxFiles = 5;
+            if (this.newImages.length + files.length > maxFiles) {
+                alert(`You can only upload a maximum of ${maxFiles} images.`);
+                return;
+            }
+            this.newImages = [...this.newImages, ...files];
         },
         removeNewImage(index) {
             this.newImages.splice(index, 1);
