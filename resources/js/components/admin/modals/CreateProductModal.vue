@@ -131,7 +131,7 @@
                                     class="position-relative"
                                 >
                                     <img
-                                        :src="preview"
+                                        :src="preview.src"
                                         :alt="`New Image ${index + 1}`"
                                         class="img-thumbnail"
                                         style="
@@ -224,24 +224,43 @@ export default {
                 "image/gif",
                 "image/webp",
             ];
+
             const invalidFiles = files.filter(
                 (file) => !validExtensions.includes(file.type)
             );
 
             if (invalidFiles.length > 0) {
+                this.errors.images =
+                    "Invalid image format. Only JPEG, PNG, GIF, and WEBP are allowed.";
                 this.newImages = [];
-                this.errors.images = "Invalid image format.";
                 return;
-            } else {
-                this.errors.images = "";
-                this.newImages.push(...files);
-                this.updateImagePreviews();
             }
+
+            const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+            const existingImagesSize = this.newImages.reduce(
+                (sum, file) => sum + file.size,
+                0
+            );
+            const combinedSize = totalSize + existingImagesSize;
+
+            if (combinedSize > 2 * 1024 * 1024) {
+                this.errors.images =
+                    "Total size of images must not exceed 2MB.";
+                return;
+            }
+
+            this.errors.images = "";
+            this.newImages.push(...files);
+            this.updateImagePreviews();
         },
         updateImagePreviews() {
-            this.imagePreviews = this.newImages.map((image) =>
-                URL.createObjectURL(image)
-            );
+            this.imagePreviews = this.newImages.map((file) => {
+                const sizeInKB = (file.size / 1024).toFixed(2);
+                return {
+                    src: URL.createObjectURL(file),
+                    sizeText: sizeInKB,
+                };
+            });
         },
         removeNewImage(index) {
             this.newImages.splice(index, 1);
@@ -302,6 +321,7 @@ export default {
 
                 this.newImages.forEach((image, index) => {
                     formData.append(`images[${index}]`, image);
+                    formData.append(`images_size[${index}]`, image.size);
                 });
 
                 const response = await axios.post("/admin/product", formData, {

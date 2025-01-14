@@ -137,6 +137,10 @@
                                         >
                                             &times;
                                         </button>
+                                        <p class="mt-1">
+                                            <strong>Size:</strong>
+                                            {{ formatFileSize(image.size) }}
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -189,6 +193,19 @@
                                         </button>
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Remaining Space</label>
+                            <div v-if="remainingSpace < 0" class="text-danger">
+                                <strong>Error:</strong> Total image size exceeds
+                                2MB limit. You can only upload
+                                {{ formatFileSize(Math.abs(remainingSpace)) }}
+                                more.
+                            </div>
+                            <div v-else>
+                                <strong>Remaining Space:</strong>
+                                {{ formatFileSize(remainingSpace) }}
                             </div>
                         </div>
                     </div>
@@ -251,6 +268,7 @@ export default {
             categories: [],
             newImages: [],
             deletedImageIds: [],
+            remainingSpace: 2 * 1024 * 1024,
             isUpdating: false,
             errors: {},
         };
@@ -265,12 +283,14 @@ export default {
                         images: newVal.images || [],
                     };
                     this.deletedImageIds = [];
+                    this.calculateRemainingSpace();
                 }
             },
         },
     },
     mounted() {
         this.fetchCategories();
+        this.calculateRemainingSpace();
     },
     methods: {
         fetchCategories() {
@@ -384,6 +404,7 @@ export default {
 
             this.newImages.forEach((image, index) => {
                 formData.append(`images[${index}]`, image);
+                formData.append(`images_size[${index}]`, image.size);
             });
 
             return axios.post(
@@ -399,21 +420,55 @@ export default {
                 }
             );
         },
+        formatFileSize(sizeInBytes) {
+            if (sizeInBytes === 0) return "0 bytes";
+            const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+            const i = Math.floor(Math.log(sizeInBytes) / Math.log(1024));
+            return (
+                (sizeInBytes / Math.pow(1024, i)).toFixed(2) + " " + sizes[i]
+            );
+        },
         getImageUrl(imagePath) {
             const url = `${import.meta.env.VITE_API_URL}/storage/${imagePath}`;
             return url;
         },
+        calculateRemainingSpace() {
+            const totalSize =
+                this.productData.images.reduce(
+                    (sum, image) => sum + image.size,
+                    0
+                ) + this.newImages.reduce((sum, image) => sum + image.size, 0);
+            this.remainingSpace = 2 * 1024 * 1024 - totalSize;
+        },
         handleFileUpload(event) {
             const files = Array.from(event.target.files);
             const maxFiles = 5;
+            const totalNewImagesSize = files.reduce(
+                (sum, file) => sum + file.size,
+                0
+            );
+
+            const totalExistingImagesSize = this.productData.images.reduce(
+                (sum, image) => sum + image.size,
+                0
+            );
+
+            const totalSize = totalExistingImagesSize + totalNewImagesSize;
+            if (totalSize > 2 * 1024 * 1024) {
+                alert("Total image size exceeds the 2MB limit.");
+                return;
+            }
+
             if (this.newImages.length + files.length > maxFiles) {
                 alert(`You can only upload a maximum of ${maxFiles} images.`);
                 return;
             }
             this.newImages = [...this.newImages, ...files];
+            this.calculateRemainingSpace();
         },
         removeNewImage(index) {
             this.newImages.splice(index, 1);
+            this.calculateRemainingSpace();
         },
         removeImage(image) {
             if (!confirm("Are you sure you want to delete this image?")) {
@@ -424,6 +479,7 @@ export default {
                 (img) => img.id !== image.id
             );
             this.validate();
+            this.calculateRemainingSpace();
         },
         deleteImage() {
             this.deletedImageIds.forEach((imageId) => {

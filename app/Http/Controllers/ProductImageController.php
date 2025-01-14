@@ -34,14 +34,38 @@ class ProductImageController extends Controller
         $productId = $request->input('product_id');
         $images = $request->file('images');
 
+        $uploadTotalSize = array_sum(array_map(function ($image) {
+            return $image->getSize();
+        }, $images));
+
+        $existingImages = ProductImage::where('product_id', $productId)->get();
+        $existingTotalSize = 0;
+
+        foreach ($existingImages as $existingImage) {
+            $path = storage_path('app/public/' . $existingImage->image_path);
+            if (file_exists($path)) {
+                $existingTotalSize += filesize($path);
+            }
+        }
+
+        $totalSize = $existingTotalSize + $uploadTotalSize;
+        $maxAllowedSize = 2 * 1024 * 1024;
+
+        if ($totalSize > $maxAllowedSize) {
+            return response()->json(['error' => 'Total size of images exceeds the limit of 2MB.'], 400);
+        }
+
         $storedImages = [];
 
-        foreach ($images as $image) {
+        foreach ($images as $index => $image) {
             $path = $image->store('products', 'public');
+
             $storedImage = ProductImage::create([
                 'product_id' => $productId,
                 'image_path' => $path,
+                'size' => $request->input("images_size.{$index}"),
             ]);
+
             $storedImages[] = new ProductImageResource($storedImage);
         }
 
@@ -54,7 +78,7 @@ class ProductImageController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(ProductImage $productImage)
+    public function show($productId)
     {
         //
     }

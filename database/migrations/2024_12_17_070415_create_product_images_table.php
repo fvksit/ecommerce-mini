@@ -14,6 +14,7 @@ return new class () extends Migration {
             $table->id();
             $table->foreignId('product_id')->constrained();
             $table->string('image_path');
+            $table->unsignedBigInteger('size')->nullable();
             $table->timestamps();
         });
     }

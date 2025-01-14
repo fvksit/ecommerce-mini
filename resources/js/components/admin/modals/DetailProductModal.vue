@@ -53,6 +53,10 @@
                                     object-fit: cover;
                                 "
                             />
+                            <p class="mt-1">
+                                <strong>Size:</strong>
+                                {{ formatFileSize(image.size) }}
+                            </p>
                         </div>
                     </div>
                 </div>
@@ -79,6 +83,14 @@ export default {
         getImageUrl(imagePath) {
             const url = `${import.meta.env.VITE_API_URL}/storage/${imagePath}`;
             return url;
+        },
+        formatFileSize(sizeInBytes) {
+            if (sizeInBytes === 0) return "0 bytes";
+            const sizes = ["Bytes", "KB", "MB", "GB", "TB"];
+            const i = Math.floor(Math.log(sizeInBytes) / Math.log(1024));
+            return (
+                (sizeInBytes / Math.pow(1024, i)).toFixed(2) + " " + sizes[i]
+            );
         },
         formatPrice(price) {
             if (!price) return "Rp. 0";

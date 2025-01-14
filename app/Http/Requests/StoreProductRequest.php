@@ -27,8 +27,24 @@ class StoreProductRequest extends FormRequest
             'category_id' => 'required|exists:categories,id',
             'price' => 'required|numeric|min:1|max:1000000000000',
             'stock' => 'required|integer|min:1|max:1000000000000',
-            'images' => 'required|array',
+            'images' => [
+                'required',
+                'array',
+                function ($attribute, $value, $fail) {
+                    $totalSize = 0;
+
+                    foreach ($value as $image) {
+                        $totalSize += $image->getSize();
+                    }
+
+                    if ($totalSize > 2 * 1024 * 1024) {
+                        $fail('The total size of images must not exceed 2MB.');
+                    }
+                }
+            ],
             'images.*' => 'required|image|mimes:jpg,png,jpeg|max:2048',
+            'images_size' => 'array',
+            'images_size.*' => 'required|integer|min:1',
         ];
     }
 }
